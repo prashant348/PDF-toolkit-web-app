@@ -1,0 +1,131 @@
+# =====================================================================
+# General and Operating System Ignore Patterns
+# =====================================================================
+
+# Operating System files
+.DS_Store # macOS thumbnail cache
+.localized
+ehthumbs.db # Windows thumbnail cache
+Thumbs.db
+Desktop.ini
+.cache
+.project
+.idea/ # Common directory for IDE settings
+
+# Backup and swap files
+*~
+*.swp
+.netrwhist
+*#
+.#*
+%*
+._*
+
+# =====================================================================
+# Python (FastAPI Backend) Ignore Patterns
+# =====================================================================
+
+# Byte-compiled / optimized files
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+*.egg-info/
+
+# Virtual environment
+.venv/
+venv/
+env/
+ENV/
+build/
+develop-eggs/
+dist/
+*egg
+
+# Dependencies
+# Pip
+pip-wheel-cache/
+.pip-node-cache/
+sitecustomize.py # Used by some tools to inject code into python
+pip.log
+pip-selfcheck.json
+
+# Sphinx documentation
+docs/_build/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Unit test / coverage reports
+.coverage
+.coverage.*
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.hypothesis/
+.pytest_cache/
+
+# Environment variables
+# Ignore files containing sensitive data like API keys and database credentials.
+.env
+.flaskenv
+instance/
+.python-version
+
+# IDE-specific files (e.g., PyCharm)
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# =====================================================================
+# JavaScript/Frontend (Vanilla JS) Ignore Patterns
+# =====================================================================
+
+# Dependencies
+node_modules/
+
+# Optional npm cache directory
+.npm/
+
+# Optional eslint cache
+.eslintcache
+
+# Optional storybook cache
+.storybook/*.json
+
+# Production build files
+# Assuming a simple build process, adjust if you use a specific bundler (e.g., webpack, vite)
+dist/
+build/
+*.tgz
+*.zip
+
+# Environment Variables
+# If you use a file to load frontend environment variables
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.staging.local
+
+# TypeScript cache/output (if you add TypeScript later)
+*.tsbuildinfo
+
+# IDE-specific (VS Code)
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/extensions.json
+.vscode/*.log
+
+# =====================================================================
+# Database Ignore Patterns
+# =====================================================================
+
+# SQLite database file (if used, common in development)
+# For other databases, this might be different.
+*.db
+*.sqlite
+*.sqlite3
