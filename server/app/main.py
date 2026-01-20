@@ -1,11 +1,14 @@
 from fastapi import FastAPI
+from dotenv import load_dotenv
+from auth.router import router as auth_router
 import uvicorn
-import dotenv
-dotenv.load_dotenv()
+import os
+
+load_dotenv()
 
 app = FastAPI()
-port = int(dotenv.get_key(".env", "FASTAPI_PORT"))
-
+app.include_router(auth_router)
+port = int(os.getenv("FASTAPI_PORT"))
 
 @app.get("/")
 def root():

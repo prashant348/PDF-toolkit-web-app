@@ -129,3 +129,16 @@ build/
 *.db
 *.sqlite
 *.sqlite3
+
+# --- SQLAlchemy / Alembic ---
+# Ignore the local configuration file if it contains sensitive DB URLs
+# Note: Keep alembic.ini tracked if you use environment variables for the URL
+# alembic.ini
+
+# Ignore compiled python files in the migrations directory
+migrations/__pycache__/
+migrations/versions/__pycache__/
+
+# NEVER ignore migrations/versions/*.py files unless they are specifically temporary.
+# These must be shared with your team to keep database schemas in sync.
+
