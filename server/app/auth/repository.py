@@ -1,34 +1,26 @@
 from sqlalchemy.orm import Session
 from auth.models import User
-from auth.schemas import UserSchema
 
 class AuthRepository:
-    def __init__(self) -> None:
-        pass
+    def __init__(self, db: Session) -> None:
+        self.db = db
 
     def create_user(
             self, 
-            db: Session, 
             email: str, 
             password: str
-        ) -> UserSchema | None:
+        ) -> User | None:
         user = User(email=email, password=password)
-        db.add(user)
-        db.commit()
-        db.refresh(user)
+        self.db.add(user)
+        self.db.commit()
+        self.db.refresh(user)
 
-        return {
-            "id": user.id,
-            "email": user.email
-        }
+        return user
 
     
-    def getUserByEmail(self, db: Session, email: str) -> UserSchema | None:
-        user = db.query(User).filter(User.email == email).first()
+    def getUserByEmail(self, email: str) -> User | None:
+        user = self.db.query(User).filter(User.email == email).first()
         if (not user):
             return None
-        return {
-            "id": user.id,
-            "email": user.email
-        }
+        return user
         
