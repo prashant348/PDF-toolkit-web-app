@@ -1,36 +1,14 @@
-import { Navigate } from "react-router-dom"
-import { useState, useEffect } from "react"
-import { apiGet } from "../libs/api";
 
-interface ProtectedRouteProps {
-    children: React.ReactNode
-}
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../libs/authContext";
+import { type JSX } from "react";
 
-interface User {
-    id: string
-    email: string
-}
+export default function ProtectedRoute({ children }: { children: JSX.Element }) {
+  const { user, loading, isAuthenticated } = useAuth();
 
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-    const [loading, setLoading] = useState<boolean>(true);
-    const [authenticated, setAuthenticated] = useState<boolean>(false);
+  if (loading) return <p>Loading...</p>;
 
-    useEffect(() => {
-        apiGet<User>("/auth/me").then((res) => {
-            console.log("res", res)
-            setAuthenticated(true)
-        }).catch((err) => {
-            console.log("err: ", err)
-            setAuthenticated(false)
-        }).finally(() => {
-            setLoading(false);
-        })
-    }, [])
+  if (!user || !isAuthenticated) return <Navigate to="/login" />;
 
-    if (loading) return <p>Loading...</p>
-
-    if (!authenticated) return <Navigate to={"/login"} />
-
-    return children;
-
+  return children;
 }
