@@ -18,9 +18,14 @@ class AuthRepository:
         return user
 
     
-    def getUserByEmail(self, email: str) -> User | None:
+    def get_user_by_email(self, email: str) -> User | None:
         user = self.db.query(User).filter(User.email == email).first()
         if (not user):
             return None
         return user
-        
+
+    def get_user_by_id(self, id: str) -> User | None:
+        user = self.db.query(User).filter(User.id == id).first()
+        if (not user):
+            return None
+        return user        

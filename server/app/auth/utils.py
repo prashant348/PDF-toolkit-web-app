@@ -22,3 +22,6 @@ def generate_access_token(user_data: dict["id": str, "email": str ]) -> str:
     to_encode.update({ "exp": expire })
     return jwt.encode(to_encode, JWT_SECRET, algorithm=ALGORITHMS[0])
     
+def verify_access_token(token: str):
+    return jwt.decode(token, JWT_SECRET, algorithms=ALGORITHMS[0])
+ 

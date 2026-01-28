@@ -1,8 +1,7 @@
-from sqlalchemy.orm import Session
 from auth.repository import AuthRepository
 from auth.utils import hash_password, normalized_email
 from auth.dependencies import authenticate_user
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse
 
 
 class AuthService:
@@ -14,7 +13,7 @@ class AuthService:
             email = normalized_email(email)
             password = hash_password(password)
             # check if user already exists by user email
-            user = self.repo.getUserByEmail(email)
+            user = self.repo.get_user_by_email(email)
             # if user already exists then return error response
             if user:
                 return JSONResponse(
@@ -78,9 +77,11 @@ class AuthService:
             response.set_cookie(
                 key="access_token",
                 value=token,
+                expires= 30 * 60, # 30 mins
                 httponly=True,
                 samesite="lax",
                 secure=False # for local dev only
+
             )
 
             # now return the response object
@@ -95,6 +96,7 @@ class AuthService:
                     "msg": "Error logging in user"
                 }
             )
+
 
 
     
