@@ -49,3 +49,7 @@ class AuthRepository:
             )
             .first()
         )
+    
+    def delete_refresh_token(self,token: str):
+        self.db.query(RefreshToken).filter(RefreshToken.token == token).delete()
+        self.db.commit()

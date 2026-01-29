@@ -1,5 +1,5 @@
 import { useAuth } from "../../libs/authContext"
-
+import LogOutButton from "./components/LogOut"
 export default function Dashboard() {
 
     const { user } = useAuth()
@@ -13,6 +13,7 @@ export default function Dashboard() {
             <div>
                 Welcome, {user?.email}
             </div>
+            <LogOutButton />
         </div>
 
     )

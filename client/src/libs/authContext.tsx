@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { fetchMe, refreshAccessToken } from "./auth";
+import { apiPost } from "./api";
 
 type User = {
   id: string;
@@ -11,6 +12,7 @@ type AuthContextType = {
   loading: boolean;
   isAuthenticated: boolean;
   refetchUser: () => Promise<void>;
+  logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -30,6 +32,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       setIsAuthenticated(false);
       throw err;
+    }
+  }
+
+  const logout = async () => {
+    try {
+      await apiPost("/auth/logout");
+      setUser(null);
+      setIsAuthenticated(false);
+      window.location.href = "/login"
+    } catch (err) {
+      console.error("Logout error: ", err);
+      setUser(null);
+      setIsAuthenticated(false);
+      window.location.href = "/login"
     }
   }
 
@@ -60,7 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, isAuthenticated, refetchUser }}>
+    <AuthContext.Provider value={{ user, loading, isAuthenticated, refetchUser, logout }}>
       {children}
     </AuthContext.Provider>
   );

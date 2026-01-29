@@ -184,6 +184,36 @@ class AuthService:
                     "msg": "Error refreshing token"
                 }
             ) 
+        
+    def logout(self, request: Request):
+        try:
+            access_token = request.cookies.get("access_token") 
+            refresh_token = request.cookies.get("refresh_token")
+
+            self.repo.delete_refresh_token(refresh_token)
+
+            response = JSONResponse(
+                status_code=200,
+                content={
+                    "success": True,
+                    "msg": "User logged out successfully"
+                }
+            )
+
+            response.delete_cookie(key="access_token")
+            response.delete_cookie(key="refresh_token")
+
+            return response
+        except Exception as e:
+            print("Logout Error: ", e)
+            return JSONResponse(
+                status_code=500,
+                content={
+                    "success": False,
+                    "msg": "Error logging out user"
+                }
+            )
+
             
         
 
