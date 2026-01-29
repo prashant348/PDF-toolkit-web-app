@@ -2,10 +2,16 @@ import { useForm } from "react-hook-form"
 import type { RegisterFormData } from "../../schemas/RegisterSchema"
 import { registerResolver } from "../../schemas/RegisterSchema"
 import { apiPost } from "../../libs/api"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
+interface SuccessResponse {
+  success: boolean;
+  msg: string
+}
 
 export default function RegisterPage() {
+
+  const navigate = useNavigate();
 
   const {
     register, // to register input fields
@@ -18,12 +24,16 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterFormData) => {
     try {
       console.log("form data", data)
-      const res = await apiPost<RegisterFormData>("/auth/register", {
+      const res: SuccessResponse = await apiPost("/auth/register", {
         email: data.email,
         password: data.password
       })
 
       console.log("res", res)
+
+      if (res.success) {
+        navigate("/login")
+      }
 
     } catch (err) {
       console.error("Error registering user", err)
@@ -86,7 +96,7 @@ export default function RegisterPage() {
       </form>
       <div>
         <p>already have an account?</p>
-        <Link to={"/auth/login"} className="text-blue-500 underline">
+        <Link to={"/login"} className="text-blue-500 underline">
           Log In
         </Link>
       </div>

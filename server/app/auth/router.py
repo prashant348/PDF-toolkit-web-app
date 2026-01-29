@@ -19,6 +19,10 @@ def register(data: RegistrationSchema, db: Session = Depends(get_db)):
 def login(data: LoginSchema, db: Session = Depends(get_db)):
     return AuthService(AuthRepository(db)).login(data.email, data.password)
 
+@router.post(path="/refresh", status_code=200)
+def refresh(request: Request, db: Session = Depends(get_db)):
+    return AuthService(AuthRepository(db)).refresh(request)
+
 @router.get(path="/me", status_code=200)
 def me(request: Request, db: Session = Depends(get_db)):
     user = get_current_user(AuthRepository(db), request)

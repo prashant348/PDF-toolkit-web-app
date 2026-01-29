@@ -1,8 +1,12 @@
 from auth.repository import AuthRepository
-from auth.utils import hash_password, normalized_email
+from auth.utils import hash_password, normalized_email, generate_access_token
 from auth.dependencies import authenticate_user
 from fastapi.responses import JSONResponse
+from datetime import datetime, timedelta, timezone
+from auth.utils import generate_refresh_token
+from fastapi import Request
 
+REFRESH_TOKEN_EXPIRE_DAYS = 7 
 
 class AuthService:
     def __init__(self, repo: AuthRepository) -> None:
@@ -53,9 +57,9 @@ class AuthService:
         try:
             email = normalized_email(email)
             # if user is authenticated then return jwt generated access token
-            token = authenticate_user(self.repo, email, password)
+            access_token = authenticate_user(self.repo, email, password)
             # if user is not authenticated then return error response 
-            if not token:
+            if not access_token:
                 return JSONResponse(
                     status_code=401,
                     content={
@@ -63,6 +67,19 @@ class AuthService:
                         "msg": "Invalid credentials"
                     }
                 )
+            
+            # if user is authenticated then create refresh token
+            refresh_token = generate_refresh_token()
+            # get user id
+            user = self.repo.get_user_by_email(email)
+
+            expire = datetime.now(timezone.utc) + timedelta(days=float(REFRESH_TOKEN_EXPIRE_DAYS))
+
+            self.repo.create_refresh_token(
+                user_id=user.id,
+                token=refresh_token,
+                expires_at=expire
+            )
             
             # Create the success response object locally before setting cookie 
             response = JSONResponse(
@@ -76,12 +93,20 @@ class AuthService:
             # now set cookie on the response object
             response.set_cookie(
                 key="access_token",
-                value=token,
-                expires= 30 * 60, # 30 mins
+                value=access_token,
+                max_age= 30 * 60, # 30 mins
                 httponly=True,
                 samesite="lax",
                 secure=False # for local dev only
+            )
 
+            response.set_cookie(
+                key="refresh_token",
+                value=refresh_token,
+                max_age= REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60, # 7 days
+                httponly=True,
+                samesite="lax",
+                secure=False # for local dev only
             )
 
             # now return the response object
@@ -96,6 +121,71 @@ class AuthService:
                     "msg": "Error logging in user"
                 }
             )
+    
+    def refresh(self, request: Request):
+        try:
+            refresh_token = request.cookies.get("refresh_token")
+
+            if not refresh_token:
+                return JSONResponse(
+                    status_code=401,
+                    content={
+                        "success": False,
+                        "msg": "Refresh token not found"
+                    }
+                )
+            
+            db_token = self.repo.get_valid_refresh_token(refresh_token)
+
+            if not db_token:
+                return JSONResponse(
+                    status_code=401,
+                    content={
+                        "success": False,
+                        "msg": "Invalid refresh token"
+                    }
+                )
+            
+            user = self.repo.get_user_by_id(db_token.user_id)
+
+            access_token = generate_access_token({
+                "id": user.id,
+                "email": user.email
+            })
+
+            response = JSONResponse(
+                status_code=200,
+                content={
+                    "success": True,
+                    "user": {
+                        "id": user.id,
+                        "email": user.email
+                    }
+                }
+            )
+
+            response.set_cookie(
+                key="access_token",
+                value=access_token,
+                httponly=True,
+                samesite="lax",
+                secure=False,
+                max_age=30 * 60
+            )
+
+            return response
+
+        except Exception as e:
+            print("Refresh Error: ", e)
+            return JSONResponse(
+                status_code=500,
+                content={
+                    "success": False,
+                    "msg": "Error refreshing token"
+                }
+            ) 
+            
+        
 
 
 

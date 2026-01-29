@@ -3,6 +3,8 @@ import HomePage from "./pages/HomePage";
 import LogInPage from "./pages/LogInPage";
 import RegisterPage from "./pages/RegisterPage";
 import Dashboard from "./pages/Dashboard";
+import GuestRoute from "./components/GuestRoute";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
 
@@ -11,9 +13,24 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LogInPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/login" element={
+            <GuestRoute>
+              <LogInPage />
+            </GuestRoute>
+          }
+          />
+          <Route path="/register" element={
+            <GuestRoute>
+              <RegisterPage />
+            </GuestRoute>
+          }
+          />
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+          />
         </Routes>
       </Router>
     </>

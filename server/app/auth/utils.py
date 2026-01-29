@@ -2,6 +2,7 @@ from bcrypt import hashpw, gensalt, checkpw
 from core.config import JWT_SECRET, JWT_EXPIRE_MINUTES
 from jose import jwt
 from datetime import datetime, timedelta, timezone
+import secrets
 
 SALT_ROUNDS=12
 SALT = gensalt(rounds=SALT_ROUNDS)
@@ -25,3 +26,5 @@ def generate_access_token(user_data: dict["id": str, "email": str ]) -> str:
 def verify_access_token(token: str):
     return jwt.decode(token, JWT_SECRET, algorithms=ALGORITHMS[0])
  
+def generate_refresh_token() -> str:
+    return secrets.token_hex(64)

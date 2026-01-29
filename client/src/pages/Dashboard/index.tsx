@@ -1,20 +1,19 @@
-import ProtectedRoute from "../../components/ProtectedRoute"
 import { useAuth } from "../../libs/authContext"
 
-export default function Dashboard()  {
+export default function Dashboard() {
 
     const { user } = useAuth()
 
     return (
-        <ProtectedRoute >
+
+        <div>
             <div>
-                <div>
-                    Protected Route Dashboard
-                </div>
-                <div>
-                    Welcome, {user?.email}
-                </div>
+                Protected Route Dashboard
             </div>
-        </ProtectedRoute>
+            <div>
+                Welcome, {user?.email}
+            </div>
+        </div>
+
     )
 }

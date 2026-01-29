@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { apiGet } from "./api";
+import { fetchMe, refreshAccessToken } from "./auth";
 
 type User = {
   id: string;
@@ -10,6 +10,7 @@ type AuthContextType = {
   user: User | null;
   loading: boolean;
   isAuthenticated: boolean;
+  refetchUser: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -19,8 +20,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
+  const refetchUser = async () => {
+    try {
+      const data = await fetchMe();
+      setUser(data);
+      setIsAuthenticated(true);
+    } catch (err) {
+      console.error("Refetch user error: ", err);
+      setUser(null);
+      setIsAuthenticated(false);
+      throw err;
+    }
+  }
+
   useEffect(() => {
-    apiGet("/auth/me")
+    fetchMe()
       .then((data: User | any) => {
         setUser(data)
         setIsAuthenticated(true);
@@ -28,14 +42,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .catch(() => {
         setUser(null)
         setIsAuthenticated(false);
+        refreshAccessToken()
+        .then((data) => {
+          console.log("data: ", data)
+          setUser(data.user)
+          setIsAuthenticated(true);
+        })
+        .catch((err) => {
+          console.log("error", err)
+          setUser(null)
+          setIsAuthenticated(false);
+        })
       })
       .finally(() => {
         setLoading(false);
-      });
+      }); 
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, isAuthenticated }}>
+    <AuthContext.Provider value={{ user, loading, isAuthenticated, refetchUser }}>
       {children}
     </AuthContext.Provider>
   );
