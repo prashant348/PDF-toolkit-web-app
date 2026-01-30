@@ -28,3 +28,19 @@ def verify_access_token(token: str):
  
 def generate_refresh_token() -> str:
     return secrets.token_hex(64)
+
+def generate_email_verification_token(email: str) -> str:
+
+    expire = datetime.now(timezone.utc) + timedelta(hours=24)
+
+    payload = {
+        "sub": email,  # 'sub' is the standard field for the subject
+        "exp": expire,   # 'exp' is the standard expiration field
+        "iat": datetime.now(timezone.utc),  # 'iat' marks when it was issued
+        "type": "email_verification"  # Useful to distinguish from login tokens
+    }
+
+    return jwt.encode(payload, JWT_SECRET, algorithm=ALGORITHMS[0])
+
+def verify_email_verification_token(token: str):
+    return jwt.decode(token, JWT_SECRET, algorithms=ALGORITHMS[0])

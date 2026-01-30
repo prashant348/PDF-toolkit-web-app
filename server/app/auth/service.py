@@ -3,10 +3,14 @@ from auth.utils import hash_password, normalized_email, generate_access_token
 from auth.dependencies import authenticate_user
 from fastapi.responses import JSONResponse
 from datetime import datetime, timedelta, timezone
-from auth.utils import generate_refresh_token
+from auth.utils import generate_refresh_token, generate_email_verification_token, verify_email_verification_token
 from fastapi import Request
+from auth.schemas import EmailSchema
+from auth.email import send_email_verification_link
+import os
 
-REFRESH_TOKEN_EXPIRE_DAYS = 7 
+REFRESH_TOKEN_EXPIRE_DAYS = 7
+BASE_URL = os.getenv("FASTAPI_BASE_URL") 
 
 class AuthService:
     def __init__(self, repo: AuthRepository) -> None:
@@ -254,8 +258,88 @@ class AuthService:
                     "msg": "Error deleting account"
                 }
             )
+    
+    async def verify_email(self, email: EmailSchema):
+        try:
+            token = generate_email_verification_token(email.email)
+            res = await send_email_verification_link(email, token, BASE_URL)
+            return res
+        except Exception as e:
+            print("Verify Email Error: ", e)
+            return JSONResponse(
+                status_code=500,
+                content={
+                    "success": False,
+                    "msg": "Error verifying email"
+                }
+            )
 
+    def confirm_email(self, token: str):
+        try:
+            payload = verify_email_verification_token(token)
+            # ensure token type:
+            if (payload.get("type") != "email_verification"):
+                return JSONResponse(
+                    status_code=400, 
+                    content={
+                        "success": False,
+                        "msg": "Invalid token type"
+                        }
+                )
             
+            email = payload.get("sub")
+
+            if not email: 
+                return JSONResponse(
+                    status_code=400,
+                    content={
+                        "success": False,
+                        "msg": "Invalid token payload"
+                    }
+                )
+            
+            user = self.repo.get_user_by_email(email)
+
+            if not user:
+                return JSONResponse(
+                    status_code=404,
+                    content={
+                        "success": False,
+                        "msg": "User not found"
+                    }
+                )
+            
+            print("user from confirm email: ", user.is_verified)
+            
+            if user.is_verified:
+                return JSONResponse(
+                    status_code=400,
+                    content={
+                        "success": False,
+                        "msg": "Email already verified"
+                    }
+                )
+            
+            self.repo.mark_email_verified(user.id)
+
+            return JSONResponse(
+                status_code=200,
+                content={
+                    "success": True,
+                    "msg": "Email verified successfully"
+                }
+            )
+        except Exception as e:
+            print("Confirm Email Error: ", e)
+            return JSONResponse(
+                status_code=500,
+                content={
+                    "success": False,
+                    "msg": "Error confirming email"
+                }
+            )
+        
+
         
 
 

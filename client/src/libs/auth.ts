@@ -9,8 +9,9 @@ interface SuccessRespone {
 }
 
 type User = {
-  id: string;
-  email: string;
+    id: string;
+    email: string;
+    is_verified: string;
 };
 
 export async function fetchMe(): Promise<User> {

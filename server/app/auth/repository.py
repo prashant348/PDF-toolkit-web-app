@@ -57,3 +57,7 @@ class AuthRepository:
     def delete_user(self, user_id: str):
         self.db.query(User).filter(User.id == user_id).delete()
         self.db.commit()
+
+    def mark_email_verified(self, user_id: str):
+        self.db.query(User).filter(User.id == user_id).update({"is_verified": True})
+        self.db.commit()

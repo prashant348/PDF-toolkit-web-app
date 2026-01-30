@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Query
 from core.session import get_db
 from sqlalchemy.orm import Session
 from auth.service import AuthService
 from auth.repository import AuthRepository
-from auth.schemas import RegistrationSchema, LoginSchema
+from auth.schemas import RegistrationSchema, LoginSchema, EmailSchema
 from auth.dependencies import get_current_user
 
 router = APIRouter(
@@ -31,10 +31,19 @@ def logout(request: Request, db: Session = Depends(get_db)):
 def delete_account(request: Request, db: Session = Depends(get_db)):
     return AuthService(AuthRepository(db)).delete_account(request)
 
+@router.post(path="/verify-email", status_code=200)
+async def verify_email(email: EmailSchema, db: Session = Depends(get_db)):
+    return await AuthService(AuthRepository(db)).verify_email(email)
+
+@router.get(path="/confirm-email", status_code=200)
+def confirm_email(token: str = Query(...), db: Session = Depends(get_db)):
+    return AuthService(AuthRepository(db)).confirm_email(token)
+
 @router.get(path="/me", status_code=200)
 def me(request: Request, db: Session = Depends(get_db)):
     user = get_current_user(AuthRepository(db), request)
     return {
         "id": user.id,
-        "email": user.email
+        "email": user.email,
+        "is_verified": user.is_verified
     } 

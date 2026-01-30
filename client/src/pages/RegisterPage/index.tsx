@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form"
 import type { RegisterFormData } from "../../schemas/RegisterSchema"
 import { registerResolver } from "../../schemas/RegisterSchema"
 import { apiPost } from "../../libs/api"
-import { Link, useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 
 interface SuccessResponse {
   success: boolean;
@@ -11,12 +11,12 @@ interface SuccessResponse {
 
 export default function RegisterPage() {
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const {
     register, // to register input fields
     handleSubmit, // to handle form submission
-    formState: { errors, isSubmitting } // errors and loading state of form
+    formState: { errors, isSubmitting, isSubmitSuccessful } // errors and loading state of form
   } = useForm<RegisterFormData>({
     resolver: registerResolver
   })
@@ -32,7 +32,13 @@ export default function RegisterPage() {
       console.log("res", res)
 
       if (res.success) {
-        navigate("/login")
+        apiPost("/auth/verify-email", { email: data.email })
+        .then((res) => {
+          console.log("res", res)
+        })
+        .catch((err) => {
+          console.log("err: ", err)
+        })
       }
 
     } catch (err) {
@@ -87,6 +93,16 @@ export default function RegisterPage() {
           )}
         </div>
 
+        {isSubmitSuccessful && (
+          <p className="text-green-500">
+            Registration successful.
+            <br />
+            Please check your mail box to verify your email.
+            <br />
+            Link is valid for 24hrs only.
+          </p>
+        )}
+        
         <button
           type="submit"
           disabled={isSubmitting}

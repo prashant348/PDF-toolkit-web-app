@@ -16,6 +16,7 @@ type AuthContextType = {
   deleteAccount: () => Promise<void>;
 };
 
+
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -74,24 +75,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(null)
         setIsAuthenticated(false);
         refreshAccessToken()
-        .then((data) => {
-          console.log("data: ", data)
-          setUser(data.user)
-          setIsAuthenticated(true);
-        })
-        .catch((err) => {
-          console.log("error", err)
-          setUser(null)
-          setIsAuthenticated(false);
-        })
+          .then((data) => {
+            console.log("data: ", data)
+            setUser(data.user)
+            setIsAuthenticated(true);
+          })
+          .catch((err) => {
+            console.log("error", err)
+            setUser(null)
+            setIsAuthenticated(false);
+          })
       })
       .finally(() => {
         setLoading(false);
-      }); 
+      });
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, isAuthenticated, refetchUser, logout, deleteAccount }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        isAuthenticated,
+        refetchUser,
+        logout,
+        deleteAccount
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
