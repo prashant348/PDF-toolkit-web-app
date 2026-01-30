@@ -213,6 +213,47 @@ class AuthService:
                     "msg": "Error logging out user"
                 }
             )
+        
+    def delete_account(self, request: Request):
+        try:
+            access_token = request.cookies.get("access_token")
+            refresh_token = request.cookies.get("refresh_token")
+
+            refresh_token = self.repo.get_valid_refresh_token(refresh_token)
+
+            if not refresh_token:
+                return JSONResponse(
+                    status_code=401,
+                    content={
+                        "success": False,
+                        "msg": "Invalid refresh token"
+                    }
+                )
+            
+            self.repo.delete_refresh_token(refresh_token.token)
+            self.repo.delete_user(refresh_token.user_id)
+
+            response = JSONResponse(
+                status_code=200,
+                content={
+                    "success": True,
+                    "msg": "Account deleted successfully"
+                }
+            )
+
+            response.delete_cookie(key="access_token")
+            response.delete_cookie(key="refresh_token")
+
+            return response
+        except Exception as e:
+            print("Delete Account Error: ", e)
+            return JSONResponse(
+                status_code=500,
+                content={
+                    "success": False,
+                    "msg": "Error deleting account"
+                }
+            )
 
             
         

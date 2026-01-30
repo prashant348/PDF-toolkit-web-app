@@ -27,6 +27,10 @@ def refresh(request: Request, db: Session = Depends(get_db)):
 def logout(request: Request, db: Session = Depends(get_db)):
     return AuthService(AuthRepository(db)).logout(request)
 
+@router.delete(path="/delete-account", status_code=200)
+def delete_account(request: Request, db: Session = Depends(get_db)):
+    return AuthService(AuthRepository(db)).delete_account(request)
+
 @router.get(path="/me", status_code=200)
 def me(request: Request, db: Session = Depends(get_db)):
     user = get_current_user(AuthRepository(db), request)

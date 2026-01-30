@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { fetchMe, refreshAccessToken } from "./auth";
-import { apiPost } from "./api";
+import { apiPost, apiDel } from "./api";
 
 type User = {
   id: string;
@@ -13,6 +13,7 @@ type AuthContextType = {
   isAuthenticated: boolean;
   refetchUser: () => Promise<void>;
   logout: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -49,6 +50,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const deleteAccount = async () => {
+    try {
+      await apiDel("/auth/delete-account");
+      setUser(null);
+      setIsAuthenticated(false);
+      window.location.href = "/register"
+    } catch (err) {
+      console.error("Logout error: ", err);
+      setUser(null);
+      setIsAuthenticated(false);
+      window.location.href = "/register"
+    }
+  }
+
   useEffect(() => {
     fetchMe()
       .then((data: User | any) => {
@@ -76,7 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, isAuthenticated, refetchUser, logout }}>
+    <AuthContext.Provider value={{ user, loading, isAuthenticated, refetchUser, logout, deleteAccount }}>
       {children}
     </AuthContext.Provider>
   );
