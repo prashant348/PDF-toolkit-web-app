@@ -1,6 +1,8 @@
 import { useAuth } from "../../libs/authContext"
 import LogOutButton from "./components/LogOut"
 import DeleteAccountButton from "./components/DeleteAccount"
+import ImageToPdfPageButton from "./components/ImageToPdfPageButton"
+
 export default function Dashboard() {
 
     const { user } = useAuth()
@@ -16,6 +18,7 @@ export default function Dashboard() {
             </div>
             <LogOutButton />
             <DeleteAccountButton />
+            <ImageToPdfPageButton />
         </div>
 
     )

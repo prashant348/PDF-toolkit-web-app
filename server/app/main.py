@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from auth.router import router as auth_router
+from pdf.router import router as pdf_router
 import uvicorn
 import os
 
@@ -19,8 +20,9 @@ app.add_middleware(
     allow_credentials=True,     # Allow cookies/auth headers
     allow_methods=["*"],         # Allow all HTTP methods (GET, POST, etc.)
     allow_headers=["*"],         # Allow all headers
-)
+) 
 app.include_router(auth_router)
+app.include_router(pdf_router)
 
 
 @app.get("/")
