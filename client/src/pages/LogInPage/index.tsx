@@ -1,52 +1,31 @@
 import { useForm } from "react-hook-form"
 import type { LogInFormData } from "../../schemas/LogInSchema";
 import { LogInResolver } from "../../schemas/LogInSchema";
-import { apiPost } from "../../libs/api";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../libs/authContext";
-
-interface SuccessResponse {
-  success: boolean;
-  msg: string
-}
+import { Link } from "react-router-dom";
+import { useAuth } from "../../contexts/authContext";
+import { useEffect } from "react";
 
 export default function LogInPage() {
 
-  const navigate = useNavigate();
-  const { refetchUser } = useAuth();
-
+  const { logInError, login, isLoggingIn } = useAuth();
+  
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting }
+    formState: { errors }
   } = useForm<LogInFormData>({
     resolver: LogInResolver
   });
 
   const onSubmit = async (data: LogInFormData) => {
-    try {
-      console.log("form data: ", data)
-
-      const res: SuccessResponse = await apiPost("/auth/login", {
-        email: data.email,
-        password: data.password
-      })
-
-      console.log("res: ", res)
-
-      if (res.success) {
-        console.log("navigate to dashboard");
-        await refetchUser();
-        return navigate("/dashboard")
-      }
-
-    } catch (err) {
-      console.error("Error logging in: ", err)
-    }
+    await login(data);
   }
 
-  
-
+  useEffect(() => {
+    if (logInError) {
+      alert(logInError);
+    }
+  }, [logInError])
 
   return (
       <div>
@@ -86,9 +65,9 @@ export default function LogInPage() {
           {/* form submit button */}
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isLoggingIn}
           >
-            {isSubmitting ? "Logging in..." : "Log In"}
+            {isLoggingIn ? "Logging in..." : "Log In"}
           </button>
         </form>
 

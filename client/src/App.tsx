@@ -5,7 +5,7 @@ import RegisterPage from "./pages/RegisterPage";
 import Dashboard from "./pages/Dashboard";
 import GuestRoute from "./components/GuestRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
-import ImageToPdfPage from "./pages/ImageToPdfPage";
+import ImagesToPdfPage from "./pages/ImagesToPdfPage";
 function App() {
 
   return (
@@ -31,9 +31,9 @@ function App() {
             </ProtectedRoute>
           }
           />
-          <Route path="/dashboard/pdf/image-to-pdf" element={
+          <Route path="/dashboard/pdf/images-to-pdf" element={
             <ProtectedRoute>
-              <ImageToPdfPage />
+              <ImagesToPdfPage />
             </ProtectedRoute>
           }
           />

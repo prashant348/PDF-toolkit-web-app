@@ -1,5 +1,6 @@
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { UserSchema } from "./UserSchema";
 
 // STEP 1: Define zod schema: zod schema defines data validation rules
 const registerSchema = z.object({
@@ -32,3 +33,12 @@ export type RegisterFormData = z.infer<typeof registerSchema>;
 
 // STEP 3: Create resolver
 export const registerResolver = zodResolver(registerSchema);
+
+
+const RegisterResponseSchema = z.object({
+    success: z.boolean(),
+    message: z.string(),
+    user: UserSchema 
+});
+
+export type RegisterResponse = z.infer<typeof RegisterResponseSchema>;

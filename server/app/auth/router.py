@@ -13,31 +13,38 @@ router = APIRouter(
 
 @router.post(path="/register", status_code=201)
 def register(data: RegistrationSchema, db: Session = Depends(get_db)):
-    return AuthService(AuthRepository(db)).register(data.email, data.password)
+    result = AuthService(AuthRepository(db)).register(data.email, data.password)
+    return result
 
 @router.post(path="/login", status_code=201)
 def login(data: LoginSchema, db: Session = Depends(get_db)):
-    return AuthService(AuthRepository(db)).login(data.email, data.password)
+    result = AuthService(AuthRepository(db)).login(data.email, data.password)
+    return result
 
 @router.post(path="/refresh", status_code=200)
 def refresh(request: Request, db: Session = Depends(get_db)):
-    return AuthService(AuthRepository(db)).refresh(request)
+    result = AuthService(AuthRepository(db)).refresh(request)
+    return result
 
 @router.post(path="/logout", status_code=200)
 def logout(request: Request, db: Session = Depends(get_db)):
-    return AuthService(AuthRepository(db)).logout(request)
+    result = AuthService(AuthRepository(db)).logout(request)
+    return result
 
 @router.delete(path="/delete-account", status_code=200)
 def delete_account(request: Request, db: Session = Depends(get_db)):
-    return AuthService(AuthRepository(db)).delete_account(request)
+    result = AuthService(AuthRepository(db)).delete_account(request)
+    return result 
 
-@router.post(path="/verify-email", status_code=200)
-async def verify_email(email: EmailSchema, db: Session = Depends(get_db)):
-    return await AuthService(AuthRepository(db)).verify_email(email)
+@router.post(path="/send-mail", status_code=200)
+async def send_mail(email: EmailSchema, db: Session = Depends(get_db)):
+    result = await AuthService(AuthRepository(db)).send_mail(email)
+    return result
 
-@router.get(path="/confirm-email", status_code=200)
-def confirm_email(token: str = Query(...), db: Session = Depends(get_db)):
-    return AuthService(AuthRepository(db)).confirm_email(token)
+@router.get(path="/verify-mail", status_code=200)
+def verify_mail(token: str = Query(...), db: Session = Depends(get_db)):
+    result = AuthService(AuthRepository(db)).verify_mail(token)
+    return result
 
 @router.get(path="/me", status_code=200)
 def me(request: Request, db: Session = Depends(get_db)):

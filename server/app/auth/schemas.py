@@ -14,3 +14,8 @@ class LoginSchema(BaseModel):
 
 class EmailSchema(BaseModel):
     email: EmailStr
+
+class UserPublic(BaseModel):
+    id: str
+    email: str
+    is_verified: bool

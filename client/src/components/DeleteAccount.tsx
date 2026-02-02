@@ -1,4 +1,4 @@
-import { useAuth } from "../../../libs/authContext"
+import { useAuth } from "../contexts/authContext";
 
 export default function DeleteAccountButton() {
 

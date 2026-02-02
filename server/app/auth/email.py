@@ -32,9 +32,13 @@ conf = ConnectionConfig(
 )  
 
 
-async def send_email_verification_link(email: EmailSchema, token: str, base_url: str):
+async def send_email_verification_link(
+        email: EmailSchema, 
+        token: str, 
+        base_url: str
+    ):
     
-    verification_url = f"{base_url}/auth/confirm-email?token={token}"
+    verification_url = f"{base_url}/auth/verify-email?token={token}"
 
     html = f"""
     <p>Click to verify your email</p>
@@ -52,5 +56,8 @@ async def send_email_verification_link(email: EmailSchema, token: str, base_url:
 
     await fm.send_message(message)
 
-    return JSONResponse(status_code=200, content={"message": "Email sent"})
+    return {
+        "success": True,
+        "message": "Email sent successfully"
+    }
     

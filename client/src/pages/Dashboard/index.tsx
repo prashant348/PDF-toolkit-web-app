@@ -1,7 +1,7 @@
-import { useAuth } from "../../libs/authContext"
-import LogOutButton from "./components/LogOut"
-import DeleteAccountButton from "./components/DeleteAccount"
-import ImageToPdfPageButton from "./components/ImageToPdfPageButton"
+import { useAuth } from "../../contexts/authContext"
+import LogOutButton from "../../components/LogOutButton"
+import ImagesToPdfPageButton from "../../components/ImagesToPdfPageButton"
+import DeleteAccountButton from "../../components/DeleteAccount"
 
 export default function Dashboard() {
 
@@ -18,7 +18,7 @@ export default function Dashboard() {
             </div>
             <LogOutButton />
             <DeleteAccountButton />
-            <ImageToPdfPageButton />
+            <ImagesToPdfPageButton />
         </div>
 
     )

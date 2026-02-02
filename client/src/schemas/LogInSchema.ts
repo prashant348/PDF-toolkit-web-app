@@ -1,5 +1,6 @@
 import z from "zod";  
 import { zodResolver } from "@hookform/resolvers/zod";
+import { UserSchema } from "./UserSchema";
 
 // step 1: define zod schema
 const logInSchema = z.object({
@@ -23,3 +24,11 @@ export type LogInFormData = z.infer<typeof logInSchema>;
 // step 3: define zod resolver for loginschema
 export const LogInResolver = zodResolver(logInSchema);
 
+
+const LogInResponseSchema = z.object({
+    success: z.boolean(),
+    message: z.string(), 
+    user: UserSchema,
+});
+
+export type LogInResponse = z.infer<typeof LogInResponseSchema>;

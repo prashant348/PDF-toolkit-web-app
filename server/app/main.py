@@ -1,4 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.requests import Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from auth.router import router as auth_router
@@ -24,6 +26,15 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(pdf_router)
 
+@app.exception_handler(HTTPException)
+def global_http_exception_handler(request: Request, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "success": False,
+            "message": exc.detail
+        }
+    )
 
 @app.get("/")
 def root():

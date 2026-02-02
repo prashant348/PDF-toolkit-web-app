@@ -1,50 +1,30 @@
 import { useForm } from "react-hook-form"
 import type { RegisterFormData } from "../../schemas/RegisterSchema"
 import { registerResolver } from "../../schemas/RegisterSchema"
-import { apiPost } from "../../libs/api"
 import { Link } from "react-router-dom"
-
-interface SuccessResponse {
-  success: boolean;
-  msg: string
-}
-
+import { useAuth } from "../../contexts/authContext"
+import { useEffect } from "react"
 export default function RegisterPage() {
 
-  // const navigate = useNavigate();
+  const { registration, registrationError, isRegistering } = useAuth();
 
   const {
     register, // to register input fields
     handleSubmit, // to handle form submission
-    formState: { errors, isSubmitting, isSubmitSuccessful } // errors and loading state of form
+    formState: { errors } // errors and loading state of form
   } = useForm<RegisterFormData>({
     resolver: registerResolver
   })
 
   const onSubmit = async (data: RegisterFormData) => {
-    try {
-      console.log("form data", data)
-      const res: SuccessResponse = await apiPost("/auth/register", {
-        email: data.email,
-        password: data.password
-      })
-
-      console.log("res", res)
-
-      if (res.success) {
-        apiPost("/auth/verify-email", { email: data.email })
-        .then((res) => {
-          console.log("res", res)
-        })
-        .catch((err) => {
-          console.log("err: ", err)
-        })
-      }
-
-    } catch (err) {
-      console.error("Error registering user", err)
-    }
+    await registration(data);
   }
+
+  useEffect(() => {
+    if (registrationError) {
+      alert(registrationError);
+    }
+  }, [registrationError]);
 
   return (
     <div>
@@ -92,23 +72,14 @@ export default function RegisterPage() {
             <p className="text-red-500">{errors.confirmPassword.message}</p>
           )}
         </div>
-
-        {isSubmitSuccessful && (
-          <p className="text-green-500">
-            Registration successful.
-            <br />
-            Please check your mail box to verify your email.
-            <br />
-            Link is valid for 24hrs only.
-          </p>
-        )}
         
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isRegistering}
         >
-          {isSubmitting ? "Registering..." : "Register"}
+          {isRegistering ? "Registering..." : "Register"}
         </button>
+
       </form>
       <div>
         <p>already have an account?</p>

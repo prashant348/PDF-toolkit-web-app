@@ -7,6 +7,7 @@ router = APIRouter(
     tags=["auth"]
 )
 
-@router.post(path="/image-to-pdf", status_code=200)
-async def image_to_pdf(files: List[UploadFile] = File(...)):
-    return await PDFService().image_to_pdf(files)
+@router.post(path="/images-to-pdf", status_code=200)
+async def images_to_pdf(files: List[UploadFile] = File(...)):
+    result = await PDFService().images_to_pdf(files)
+    return result

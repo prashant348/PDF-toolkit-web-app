@@ -31,7 +31,12 @@ class AuthRepository:
             return None
         return user        
     
-    def create_refresh_token(self, user_id: str, token: str, expires_at: str) -> RefreshToken | None:
+    def create_refresh_token(
+            self, 
+            user_id: str, 
+            token: str, 
+            expires_at: str
+        ) -> RefreshToken | None:
         refresh_token = RefreshToken(user_id=user_id, token=token, expires_at=expires_at)
         self.db.add(refresh_token)
         self.db.commit()
@@ -39,7 +44,10 @@ class AuthRepository:
 
         return refresh_token
     
-    def get_valid_refresh_token(self, token: str):
+    def get_valid_refresh_token(
+            self, 
+            token: str
+        ) -> RefreshToken | None:
         return (
             self.db.query(RefreshToken)
             .filter(
@@ -50,14 +58,14 @@ class AuthRepository:
             .first()
         )
     
-    def delete_refresh_token(self,token: str):
+    def delete_refresh_token(self, token: str) -> None:
         self.db.query(RefreshToken).filter(RefreshToken.token == token).delete()
         self.db.commit()
 
-    def delete_user(self, user_id: str):
+    def delete_user(self, user_id: str) -> None:
         self.db.query(User).filter(User.id == user_id).delete()
         self.db.commit()
 
-    def mark_email_verified(self, user_id: str):
+    def mark_email_verified(self, user_id: str) -> None:
         self.db.query(User).filter(User.id == user_id).update({"is_verified": True})
         self.db.commit()

@@ -1,49 +1,22 @@
 import { useRef, useState } from "react"
+import { usePDF } from "../../contexts/pdfContext";
 
-const BASE_URL = import.meta.env.VITE_FASTAPI_BASE_URL
-
-export default function ImageToPdfPage() {
-
+export default function ImagesToPdfPage() {
+    const { isConverting, convertImagesToPdf } = usePDF();
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [isConverting, setIsConverting] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
-    const handleFileUpload = async () => {
+    const handleFilesConversion = async () => {
         try {
             if (selectedFiles.length === 0) {
                 alert("No files selected");
                 return;
             }
-
-            const formData = new FormData();
-            selectedFiles.forEach((file) => {
-                formData.append("files", file);    
-            })
-
-            const res = await fetch(`${BASE_URL}/pdf/image-to-pdf`, {
-                method: "POST",
-                body: formData,
-            })
-
-            console.log("res: ", res)
-
-            if (!res.ok) throw new Error("upload failed")
-
-            const blob = await res.blob();
-            const url = window.URL.createObjectURL(blob);
-
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `images.pdf`;
-            a.click();
-
-            window.URL.revokeObjectURL(url);
+            await convertImagesToPdf(selectedFiles);
             setSelectedFiles([]); // Clear after successful download
             if (fileInputRef.current) fileInputRef.current.value = "";
         } catch (err) {
             console.error("Error uploading file: ", err)
-        } finally {
-            setIsConverting(false);
         }
     }
 
@@ -123,8 +96,7 @@ export default function ImageToPdfPage() {
                         alert("No files selected")
                         return;
                     }
-                    setIsConverting(true);
-                    handleFileUpload();
+                    handleFilesConversion();
                 }}
                 className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg cursor-pointer hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
                 disabled={isConverting}

@@ -1,8 +1,13 @@
 const FASTAPI_BASE_URL = import.meta.env.VITE_FASTAPI_BASE_URL
 
+export type ApiErrorMessageObject = {
+    success: boolean
+    message: string
+}
+
 export type ApiError = {
     status: number
-    message: string
+    message: ApiErrorMessageObject | string
 }
 
 async function api<T>(
@@ -26,16 +31,18 @@ async function api<T>(
     });
 
     if (!response.ok) {
-        const txt = await response.text().catch(() => "");
+        const data: object | string = await response.json().catch(async () => {
+            const txt = await response.text();
+            return txt;
+        })
         throw {
             status: response.status,
-            message: txt,
+            message: data,
         } as ApiError;
     };
 
     const json = await response.json();
     return json as T;
-
 };
 
 export const apiGet = <T>(
@@ -50,7 +57,10 @@ export const apiPost = <T>(
     options: RequestInit = {}
 ) => api<T>(
     apiendpoint,
-    { ...options, method: "POST", body: JSON.stringify(body ?? {}) }
+    { ...options, 
+        method: "POST", 
+        body: JSON.stringify(body ?? {}) 
+    }
 );
 
 export const apiDel = <T>(
@@ -59,5 +69,8 @@ export const apiDel = <T>(
     options: RequestInit = {}
 ) => api<T>(
     apiendpoint, 
-    { ...options, method: "DELETE", body: JSON.stringify(body ?? {}) }
+    { ...options, 
+        method: "DELETE", body: 
+        JSON.stringify(body ?? {}) 
+    }
 );
