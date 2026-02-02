@@ -1,5 +1,4 @@
 from auth.schemas import EmailSchema
-
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType, NameEmail
 from starlette.responses import JSONResponse
 from dotenv import load_dotenv
@@ -33,7 +32,7 @@ conf = ConnectionConfig(
 
 
 async def send_email_verification_link(
-        email: EmailSchema, 
+        data: EmailSchema, 
         token: str, 
         base_url: str
     ):
@@ -47,7 +46,7 @@ async def send_email_verification_link(
 
     message = MessageSchema(
         subject="FastAPI Mail Module",
-        recipients=[email.email],
+        recipients=[data.email],
         body=html,
         subtype=MessageType.html
     )

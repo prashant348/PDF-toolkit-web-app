@@ -40,7 +40,7 @@ export default function SendMailPage() {
                         <p className="text-red-500">{sendMailError}</p>
                     )}
                 </div>
-                <button
+                <button 
                     type="submit"
                     className="border cursor-pointer"
                     disabled={isSending}

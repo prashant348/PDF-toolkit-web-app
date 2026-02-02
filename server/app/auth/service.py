@@ -7,6 +7,7 @@ from auth.utils import generate_refresh_token, generate_email_verification_token
 from fastapi import Request, HTTPException, status
 from auth.schemas import EmailSchema, UserPublic
 from auth.email import send_email_verification_link
+from core.redis import redis_client as rc
 import os
 
 REFRESH_TOKEN_EXPIRE_DAYS = 7
@@ -206,6 +207,14 @@ class AuthService:
 
     
     async def send_mail(self, data: EmailSchema):
+        key = f"email_resend_lock:{data.email}"
+        if rc.exists(key):
+            ttl = rc.ttl(key) 
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail=f"Too many requests, please try again later in {ttl} seconds"
+            )
+        
         token = generate_email_verification_token(data.email)
         res = await send_email_verification_link(data, token, BASE_URL)
         if not res:
@@ -213,6 +222,7 @@ class AuthService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error sending email"
             )
+        rc.set(key, "active", ex=60)
         return res
 
 

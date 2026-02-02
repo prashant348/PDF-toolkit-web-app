@@ -19,9 +19,12 @@ export async function logInUser(
         const error = err as ApiError
         console.log("Error logging user: ", err)
         console.log(error.message);
-        if (typeof error.message === "object") {
-            return error.message.message
-        } 
-        return error.message;
+        if (error.status < 500) {
+            if (typeof error.message === "object") {
+                return error.message.message
+            }
+            return error.message;
+        }
+        return "Something went wrong";
     }
 }
