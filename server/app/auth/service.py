@@ -205,9 +205,9 @@ class AuthService:
         return response
 
     
-    async def send_mail(self, email: EmailSchema):
-        token = generate_email_verification_token(email.email)
-        res = await send_email_verification_link(email, token, BASE_URL)
+    async def send_mail(self, data: EmailSchema):
+        token = generate_email_verification_token(data.email)
+        res = await send_email_verification_link(data, token, BASE_URL)
         if not res:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

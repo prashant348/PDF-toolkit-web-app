@@ -38,7 +38,7 @@ async def send_email_verification_link(
         base_url: str
     ):
     
-    verification_url = f"{base_url}/auth/verify-email?token={token}"
+    verification_url = f"{base_url}/auth/verify-mail?token={token}"
 
     html = f"""
     <p>Click to verify your email</p>

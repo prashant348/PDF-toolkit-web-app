@@ -8,6 +8,8 @@ import { refreshAccessToken } from "../api/auth/refresh.api";
 import { type User } from "../schemas/UserSchema";
 import { logOutUser } from "../api/auth/logout.api";
 import { deleteUserAccount } from "../api/auth/deleteAccount.api";
+import sendMail from "../api/auth/mail.api";
+import type { SendMailFormData } from "../schemas/SendMailSchema";
 
 type AuthContextType = {
   user: User | null;
@@ -17,10 +19,14 @@ type AuthContextType = {
   registrationError: string | null;
   isRegistering: boolean;
   isLoggingIn: boolean;
+  isMailSent: boolean;
+  isSending: boolean;
+  sendMailError: string | null;
   registration: (data: RegisterFormData) => Promise<void>;
   logout: () => Promise<void>;
   login: (data: LogInFormData) => Promise<void>;
   deleteAccount: () => Promise<void>;
+  sendVerificationMail: (data: SendMailFormData) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -33,6 +39,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [registrationError, setRegistrationError] = useState<string | null>(null);
   const [isRegistering, setIsRegistering] = useState<boolean>(false);
   const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
+  const [isMailSent, setIsMailSent] = useState<boolean>(false);
+  const [isSending, setIsSending] = useState<boolean>(false);
+  const [sendMailError, setSendMailError] = useState<string | null>(null);
+  // const [isVerified, setIsVerified] = useState<boolean>(false);
 
   const registration = async (
     data: RegisterFormData
@@ -73,7 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const logout = async () => {
+  const logout = async (): Promise<void> => {
     try {
       await logOutUser();
       setUser(null);
@@ -83,7 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const deleteAccount = async () => {
+  const deleteAccount = async (): Promise<void> => {
     try {
       await deleteUserAccount();
       setUser(null);
@@ -93,6 +103,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const sendVerificationMail = async (
+    data: SendMailFormData
+  ): Promise<void> => {
+    setIsSending(true);
+    const res = await sendMail(data.email);
+
+    if (typeof res === "string") {
+      setIsSending(false);
+      setIsMailSent(false);
+      setSendMailError(res);
+    } else if (typeof res === "object") {
+      setIsSending(false);
+      setIsMailSent(true);
+      setSendMailError(null);
+    }
+
+  }
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -100,6 +128,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (data) {
           setUser(data);
           setIsAuthenticated(true);
+          // setIsVerified(data.is_verified);
         }
       } catch (err) {
         console.log("error of fetchMe", err);
@@ -108,6 +137,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (data) {
             setUser(data);
             setIsAuthenticated(true);
+            // setIsVerified(data.is_verified);
           }
         } catch (err) {
           console.log("error of refreshAccessToken", err);
@@ -136,6 +166,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         registrationError,
         isRegistering,
         isLoggingIn,
+        sendVerificationMail,
+        isMailSent,
+        isSending,
+        sendMailError
       }}
     >
       {children}

@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import GuestRoute from "./components/GuestRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ImagesToPdfPage from "./pages/ImagesToPdfPage";
+import SendMailPage from "./pages/SendMailPage";
 function App() {
 
   return (
@@ -23,6 +24,10 @@ function App() {
             <GuestRoute>
               <RegisterPage />
             </GuestRoute>
+          }
+          />
+          <Route path="/verification/send-mail" element={
+            <SendMailPage />
           }
           />
           <Route path="/dashboard" element={

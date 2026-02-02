@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request, Query
+from fastapi import APIRouter, Depends, Request, Query, Body
 from core.session import get_db
 from sqlalchemy.orm import Session
 from auth.service import AuthService
@@ -37,8 +37,8 @@ def delete_account(request: Request, db: Session = Depends(get_db)):
     return result 
 
 @router.post(path="/send-mail", status_code=200)
-async def send_mail(email: EmailSchema, db: Session = Depends(get_db)):
-    result = await AuthService(AuthRepository(db)).send_mail(email)
+async def send_mail(data: EmailSchema = Body(...), db: Session = Depends(get_db)):
+    result = await AuthService(AuthRepository(db)).send_mail(data)
     return result
 
 @router.get(path="/verify-mail", status_code=200)
