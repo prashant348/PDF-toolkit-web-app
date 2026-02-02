@@ -27,6 +27,7 @@ type AuthContextType = {
   login: (data: LogInFormData) => Promise<void>;
   deleteAccount: () => Promise<void>;
   sendVerificationMail: (data: SendMailFormData) => Promise<void>;
+  setIsMailSent: (isMailSent: boolean) => void;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -169,7 +170,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         sendVerificationMail,
         isMailSent,
         isSending,
-        sendMailError
+        sendMailError,
+        setIsMailSent
       }}
     >
       {children}

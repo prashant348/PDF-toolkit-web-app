@@ -1,10 +1,15 @@
 import { useForm } from "react-hook-form"
 import { type SendMailFormData, SendMailResolver } from "../../schemas/SendMailSchema";
 import { useAuth } from "../../contexts/authContext";
+import { useEffect, useState } from "react";
+
+const BASE_COUNT = 60
 
 export default function SendMailPage() {
 
-    const { sendVerificationMail, isSending, isMailSent, sendMailError } = useAuth();
+    const { sendVerificationMail, isSending, isMailSent, sendMailError, setIsMailSent } = useAuth();
+    const [count, setCount] = useState<number>(BASE_COUNT);
+    const [isCounting, setIsCounting] = useState<boolean>(false);
 
     const {
         register,
@@ -17,6 +22,23 @@ export default function SendMailPage() {
     const onSubmit = async (data: SendMailFormData) => {
         await sendVerificationMail(data);
     }
+
+
+
+    useEffect(() => {
+        if (isMailSent) {
+            setIsCounting(true);
+            const interval = setInterval(() => {
+                setCount((prevCount) => prevCount - 1);
+                if (count === 0) {
+                    setIsCounting(false);
+                    setCount(BASE_COUNT);
+                    setIsMailSent(false);
+                }
+            }, 1000);
+            return () => clearInterval(interval);
+        }
+    }, [isMailSent, count])
 
 
     return (
@@ -40,10 +62,16 @@ export default function SendMailPage() {
                         <p className="text-red-500">{sendMailError}</p>
                     )}
                 </div>
-                <button 
+                <div className="text-blue-500 text-sm">
+                    {isCounting ? `resend in ${count} seconds` : ""}
+                </div>
+                <button
                     type="submit"
                     className="border cursor-pointer"
-                    disabled={isSending}
+                    disabled={isSending || isCounting}
+                    style={{
+                        display: isCounting? "none": ""
+                    }}
                 >
                     {isSending ? "Sending..." : "Send Verification Mail"}
                 </button>
