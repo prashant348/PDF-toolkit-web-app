@@ -1,8 +1,6 @@
-from sqlalchemy.orm import Session
 from auth.repository import AuthRepository
 from auth.utils import validate_password, generate_access_token, verify_access_token
-from fastapi import Depends, Request, HTTPException
-from core.session import get_db
+from fastapi import Request, HTTPException, status
 from jose import JWTError
 
 
@@ -14,6 +12,12 @@ def authenticate_user(repo: AuthRepository, email: str, password: str) -> str | 
 
     if not user:
         return False
+    
+    if not user.is_verified:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Email not verified"
+        )
     
     hashed_password = user.password
     validate = validate_password(password, hashed_password)

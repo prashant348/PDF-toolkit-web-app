@@ -1,6 +1,5 @@
 from auth.schemas import EmailSchema
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType, NameEmail
-from starlette.responses import JSONResponse
 from dotenv import load_dotenv
 import os
 
@@ -37,11 +36,12 @@ async def send_email_verification_link(
         base_url: str
     ):
     
-    verification_url = f"{base_url}/auth/verify-mail?token={token}"
+    # verification_url = f"{base_url}/auth/verify-email?token={token}"
+    client_side_verification_url=f"{base_url}/confirm-email?token={token}"
 
     html = f"""
     <p>Click to verify your email</p>
-    <a href="{verification_url}">Verify Email</a>
+    <a href="{client_side_verification_url}">Verify Email</a>
     """
 
     message = MessageSchema(

@@ -4,20 +4,21 @@ from auth.dependencies import authenticate_user
 from fastapi.responses import JSONResponse
 from datetime import datetime, timedelta, timezone
 from auth.utils import generate_refresh_token, generate_email_verification_token, verify_email_verification_token
-from fastapi import Request, HTTPException, status
+from fastapi import Request, HTTPException, status, BackgroundTasks
 from auth.schemas import EmailSchema, UserPublic
 from auth.email import send_email_verification_link
 from core.redis import redis_client as rc
 import os
 
 REFRESH_TOKEN_EXPIRE_DAYS = 7
-BASE_URL = os.getenv("FASTAPI_BASE_URL") 
+# BASE_URL = os.getenv("FASTAPI_BASE_URL") 
+CLIENT_BASE_URL = os.getenv("REACT_BASE_URL")
 
 class AuthService:
     def __init__(self, repo: AuthRepository) -> None:
         self.repo = repo
 
-    def register(self, email: str, password: str):
+    def register(self, email: str, password: str, background_tasks: BackgroundTasks):
         email = normalized_email(email)
 
         password = hash_password(password)
@@ -38,7 +39,14 @@ class AuthService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error creating user"
             )
-        
+        # if user is created then run the email verification background task
+        token = generate_email_verification_token(user.email)
+        background_tasks.add_task(
+            send_email_verification_link, 
+            EmailSchema(email=email), 
+            token, 
+            CLIENT_BASE_URL
+        )
         # if user is created then return success response
         return {
             "success": True,
@@ -206,7 +214,22 @@ class AuthService:
         return response
 
     
-    async def send_mail(self, data: EmailSchema):
+    async def send_email(self, data: EmailSchema):
+        # first check if user exist by email
+        user = self.repo.get_user_by_email(data.email)
+        # if noe exist then raise exception
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        # check if user is already verified or not, if verified, raise exception
+        if user.is_verified:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already verified"
+            )
+        # if user exist and not verified then invoke send_email service main logic
         key = f"email_resend_lock:{data.email}"
         if rc.exists(key):
             ttl = rc.ttl(key) 
@@ -216,7 +239,7 @@ class AuthService:
             )
         
         token = generate_email_verification_token(data.email)
-        res = await send_email_verification_link(data, token, BASE_URL)
+        res = await send_email_verification_link(data, token, CLIENT_BASE_URL)
         if not res:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -226,7 +249,7 @@ class AuthService:
         return res
 
 
-    def verify_mail(self, token: str):
+    def verify_email(self, token: str):
         payload = verify_email_verification_token(token)
         # ensure token type:
         if (payload.get("type") != "email_verification"):

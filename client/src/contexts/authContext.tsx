@@ -8,63 +8,81 @@ import { refreshAccessToken } from "../api/auth/refresh.api";
 import { type User } from "../schemas/UserSchema";
 import { logOutUser } from "../api/auth/logout.api";
 import { deleteUserAccount } from "../api/auth/deleteAccount.api";
-import sendMail from "../api/auth/mail.api";
-import type { SendMailFormData } from "../schemas/SendMailSchema";
+import { sendEmail } from "../api/auth/sendEmail.api";
+import type { SendEmailFormData } from "../schemas/SendEmailSchema";
+import { verifyEmail } from "../api/auth/verifyEmail.api";
+import type { VerifyEmailFormData } from "../schemas/VerifyEmailSchema";
 
 type AuthContextType = {
   user: User | null;
   loading: boolean;
-  isAuthenticated: boolean;
   logInError: string | null;
+  isLoggingIn: boolean;
+  isAuthenticated: boolean;
   registrationError: string | null;
   isRegistering: boolean;
-  isLoggingIn: boolean;
-  isMailSent: boolean;
   isSending: boolean;
-  sendMailError: string | null;
-  registration: (data: RegisterFormData) => Promise<void>;
+  emailSendingError: string | null;
+  isEmailSent: boolean;
+  isVerifying: boolean;
+  emailVerificationError: string | null;
+  emailVerificationSuccess: boolean;
+  register: (data: RegisterFormData) => Promise<void>;
   logout: () => Promise<void>;
   login: (data: LogInFormData) => Promise<void>;
   deleteAccount: () => Promise<void>;
-  sendVerificationMail: (data: SendMailFormData) => Promise<void>;
-  setIsMailSent: (isMailSent: boolean) => void;
+  sendEmailVerificationLink: (data: SendEmailFormData) => Promise<void>;
+  verifyUserEmail: (data: VerifyEmailFormData) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [logInError, setLogInError] = useState<string | null>(null);
-  const [registrationError, setRegistrationError] = useState<string | null>(null);
-  const [isRegistering, setIsRegistering] = useState<boolean>(false);
-  const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
-  const [isMailSent, setIsMailSent] = useState<boolean>(false);
-  const [isSending, setIsSending] = useState<boolean>(false);
-  const [sendMailError, setSendMailError] = useState<string | null>(null);
-  // const [isVerified, setIsVerified] = useState<boolean>(false);
+  // user
+  const [user, setUser] = useState<User | null>(null); // it is problamatic state might be
+  // auth loader
+  const [loading, setLoading] = useState(true); // not a problamatic state
+  // login
+  const [logInError, setLogInError] = useState<string | null>(null); // not a problamatic state
+  const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false); // not a problamatic state
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);  // not a problamatic state
+  // registration
+  const [registrationError, setRegistrationError] = useState<string | null>(null); // not a problamatic state
+  const [isRegistering, setIsRegistering] = useState<boolean>(false); // not a problamatic state
+  // email sending and verification
+  const [isSending, setIsSending] = useState<boolean>(false); // not a problamatic state
+  const [emailSendingError, setEmailSendingError] = useState<string | null>(null); // not a problamatic state
+  const [isEmailSent, setIsEmailSent] = useState<boolean>(false); // not a problamatic state
 
-  const registration = async (
+  const [isVerifying, setIsVerifying] = useState<boolean>(false); // not a problamatic state
+  const [emailVerificationError, setEmailVerificationError] = useState<string | null>(null); // not a problamatic state
+  const [emailVerificationSuccess, setEmailVerificationSuccess] = useState<boolean>(false); // not a problamatic state
+  
+  const register = async (
     data: RegisterFormData
   ): Promise<void> => {
+    setRegistrationError(null);
     setIsRegistering(true);
     const res = await registerUser(data);
 
     if (typeof res === "string") {
       setIsRegistering(false);
       setRegistrationError(res);
+      setUser(null);
     } else if (typeof res === "object") {
       setIsRegistering(false);
       setRegistrationError(null);
-      alert("Registration successful!\nPlease check your email to verify your account before logging in.");
+      setUser(res);
       console.log("navigate to login") // add logic to navigate to login
+      const encodedEmail = encodeURIComponent(data.email);
+      window.location.href = `/verify-email?email=${encodedEmail}`
     }
   }
 
   const login = async (
     data: LogInFormData
   ): Promise<void> => {
+    setLogInError(null);
     setIsLoggingIn(true);
     const res = await logInUser({
       email: data.email,
@@ -100,36 +118,57 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       setIsAuthenticated(false);
     } catch (err) {
-      console.error("Logout error: ", err);
+      console.error("deleteAccount error: ", err);
     }
   }
 
-  const sendVerificationMail = async (
-    data: SendMailFormData
+  const sendEmailVerificationLink = async (
+    data: SendEmailFormData
   ): Promise<void> => {
+    setEmailSendingError(null);
+    setIsEmailSent(false);
     setIsSending(true);
-    const res = await sendMail(data.email);
+    const res = await sendEmail(data.email);
 
     if (typeof res === "string") {
       setIsSending(false);
-      setIsMailSent(false);
-      setSendMailError(res);
+      setIsEmailSent(false);
+      setEmailSendingError(res);
     } else if (typeof res === "object") {
       setIsSending(false);
-      setIsMailSent(true);
-      setSendMailError(null);
+      setIsEmailSent(true);
+      setEmailSendingError(null);
     }
 
   }
 
+  const verifyUserEmail = async (
+    data: VerifyEmailFormData
+  ): Promise<void> => {
+    setEmailVerificationError(null);
+    setEmailVerificationSuccess(false);
+    setIsVerifying(true);
+
+    const res = await verifyEmail(data.token);
+
+    if (typeof res === "string") {
+      setIsVerifying(false);
+      setEmailVerificationError(res);  
+      setEmailVerificationSuccess(false);
+    } else if (typeof res === "object") {
+      setIsVerifying(false);
+      setEmailVerificationError(null);
+      setEmailVerificationSuccess(true);
+    }
+  }
+
   useEffect(() => {
-    const checkAuth = async () => {
+    const initAuth = async () => {
       try {
         const data = await fetchMe();
         if (data) {
           setUser(data);
           setIsAuthenticated(true);
-          // setIsVerified(data.is_verified);
         }
       } catch (err) {
         console.log("error of fetchMe", err);
@@ -138,20 +177,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (data) {
             setUser(data);
             setIsAuthenticated(true);
-            // setIsVerified(data.is_verified);
           }
         } catch (err) {
           console.log("error of refreshAccessToken", err);
           setUser(null);
           setIsAuthenticated(false);
+
         }
       } finally {
         setLoading(false);
       }
     }
 
-    checkAuth();
-  }, []);
+    initAuth();
+  }, []); // dont know which dependencies should i give here?
 
   return (
     <AuthContext.Provider
@@ -161,17 +200,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated,
         logout,
         deleteAccount,
-        registration,
+        register,
         login,
         logInError,
         registrationError,
         isRegistering,
         isLoggingIn,
-        sendVerificationMail,
-        isMailSent,
+        sendEmailVerificationLink,
+        isEmailSent,
         isSending,
-        sendMailError,
-        setIsMailSent
+        emailSendingError,
+        verifyUserEmail,
+        isVerifying,
+        emailVerificationError,
+        emailVerificationSuccess,
       }}
     >
       {children}

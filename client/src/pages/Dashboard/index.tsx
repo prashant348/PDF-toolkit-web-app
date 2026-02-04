@@ -10,7 +10,12 @@ export default function Dashboard() {
     return (
 
         <div>
-            <div>
+            {!user?.is_verified && (
+                <p className="text-amber-600 text-sm bg-yellow-100 p-3 rounded-2xl">
+                    Please verify your account otherwise you won't be able to access all the features of app
+                </p>
+            )}
+            <div> 
                 Protected Route Dashboard
             </div>
             <div>

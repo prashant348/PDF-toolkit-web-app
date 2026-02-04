@@ -1,20 +1,20 @@
 import { apiPost } from "../../libs/api";
 import type { ApiError } from "../../libs/api";
-import type { SendMailResponse } from "../../schemas/MailSchema";
+import type { SendEmailResponse } from "../../schemas/SendEmailSchema";
 
 
-export default async function sendMail(
+export async function sendEmail(
     email: string
-): Promise<SendMailResponse | string> {
+): Promise<SendEmailResponse | string> {
     try {
-        const res = await apiPost<SendMailResponse>("/auth/send-mail", {
+        const res = await apiPost<SendEmailResponse>("/auth/send-email", {
             email: email
         });
         console.log("res from sendMail: ", res)
         return res;
     } catch (err: any) {
         const error = err as ApiError;
-        console.log("Error sending mail: ", err)
+        console.log("Error sending email: ", err)
         console.log(error.message);
         if (error.status < 500) {
             if (typeof error.message === "object") {

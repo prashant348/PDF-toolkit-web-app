@@ -9,7 +9,7 @@ export default function ImagesToPdfPageButton() {
         onClick={() => navigate("/dashboard/pdf/images-to-pdf")}
         className="border cursor-pointer"
     >
-        Image to PDF
+        Images to PDF
     </button>
   )
 }

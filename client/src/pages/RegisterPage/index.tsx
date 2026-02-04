@@ -6,7 +6,7 @@ import { useAuth } from "../../contexts/authContext"
 import { useEffect } from "react"
 export default function RegisterPage() {
 
-  const { registration, registrationError, isRegistering } = useAuth();
+  const { register: _register, registrationError, isRegistering } = useAuth();
 
   const {
     register, // to register input fields
@@ -17,14 +17,14 @@ export default function RegisterPage() {
   })
 
   const onSubmit = async (data: RegisterFormData) => {
-    await registration(data);
+    await _register(data);
   }
 
-  useEffect(() => {
-    if (registrationError) {
-      alert(registrationError);
-    }
-  }, [registrationError]);
+  // useEffect(() => {
+  //   if (registrationError) {
+  //     alert(registrationError);
+  //   }
+  // }, [registrationError]);
 
   return (
     <div>
@@ -72,6 +72,10 @@ export default function RegisterPage() {
             <p className="text-red-500">{errors.confirmPassword.message}</p>
           )}
         </div>
+
+        {registrationError && !isRegistering && (
+          <p className="text-red-500 text-sm">{registrationError}</p>
+        )}
         
         <button
           type="submit"

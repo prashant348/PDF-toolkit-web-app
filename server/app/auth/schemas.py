@@ -19,3 +19,6 @@ class UserPublic(BaseModel):
     id: str
     email: str
     is_verified: bool
+
+class TokenSchema(BaseModel):
+    token: str
