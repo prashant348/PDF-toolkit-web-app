@@ -2,7 +2,7 @@ import { useAuth } from "../../contexts/authContext"
 import LogOutButton from "../../components/LogOutButton"
 import ImagesToPdfPageButton from "../../components/ImagesToPdfPageButton"
 import DeleteAccountButton from "../../components/DeleteAccount"
-
+import { MergePdfsButton } from "../../components/MergePdfsButton"
 export default function Dashboard() {
 
     const { user } = useAuth()
@@ -24,6 +24,7 @@ export default function Dashboard() {
             <LogOutButton />
             <DeleteAccountButton />
             <ImagesToPdfPageButton />
+            <MergePdfsButton />
         </div>
 
     )

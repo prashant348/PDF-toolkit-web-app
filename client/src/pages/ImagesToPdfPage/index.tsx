@@ -2,22 +2,19 @@ import { useRef, useState } from "react"
 import { usePDF } from "../../contexts/pdfContext";
 
 export default function ImagesToPdfPage() {
-    const { isConverting, convertImagesToPdf } = usePDF();
+    const { isConverting, convertImagesToPdf, convertingError } = usePDF();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
     const handleFilesConversion = async () => {
-        try {
-            if (selectedFiles.length === 0) {
-                alert("No files selected");
-                return;
-            }
-            await convertImagesToPdf(selectedFiles);
-            setSelectedFiles([]); // Clear after successful download
-            if (fileInputRef.current) fileInputRef.current.value = "";
-        } catch (err) {
-            console.error("Error uploading file: ", err)
+        if (selectedFiles.length === 0) {
+            alert("No files selected");
+            return;
         }
+        await convertImagesToPdf(selectedFiles);
+        setSelectedFiles([]); // Clear after successful download
+        if (fileInputRef.current) fileInputRef.current.value = "";
+
     }
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,12 +37,12 @@ export default function ImagesToPdfPage() {
     return (
         <div>
             <h1>convert image to pdf</h1>
-            <input 
-                type="file" 
-                ref={fileInputRef} 
+            <input
+                type="file"
+                ref={fileInputRef}
                 hidden
                 onChange={handleFileSelect}
-                multiple 
+                multiple
                 accept="image/*"
             />
             <div
@@ -81,6 +78,10 @@ export default function ImagesToPdfPage() {
                     </div>
                 )}
             </div>
+            {convertingError && !isConverting && (
+                <p className="text-sm text-red-500">{convertingError}</p>
+            )}
+
             {selectedFiles.length > 0 && (
                 <button
                     onClick={clearAllFiles}
@@ -89,6 +90,7 @@ export default function ImagesToPdfPage() {
                     Clear all
                 </button>
             )}
+
 
             <button
                 onClick={() => {

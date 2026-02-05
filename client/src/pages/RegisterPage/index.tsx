@@ -3,7 +3,6 @@ import type { RegisterFormData } from "../../schemas/RegisterSchema"
 import { registerResolver } from "../../schemas/RegisterSchema"
 import { Link } from "react-router-dom"
 import { useAuth } from "../../contexts/authContext"
-import { useEffect } from "react"
 export default function RegisterPage() {
 
   const { register: _register, registrationError, isRegistering } = useAuth();

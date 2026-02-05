@@ -9,6 +9,8 @@ import ImagesToPdfPage from "./pages/ImagesToPdfPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
 import ConfirmEmailPage from "./pages/ConfirmEmailPage";
 import UnverifiedUserRoute from "./components/UnverifiedUserRoute";
+import MergePdfsPage from "./pages/mergePdfsPage";
+
 function App() {
 
   return (
@@ -50,6 +52,12 @@ function App() {
               <ImagesToPdfPage />
             </ProtectedRoute>
           }
+          />
+          <Route path="/dashboard/pdf/merge-pdfs" element={
+            <ProtectedRoute>
+              <MergePdfsPage />
+            </ProtectedRoute>
+          } 
           />
         </Routes>
       </Router>
