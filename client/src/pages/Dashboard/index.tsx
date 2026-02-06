@@ -3,9 +3,12 @@ import LogOutButton from "../../components/LogOutButton"
 import ImagesToPdfPageButton from "../../components/ImagesToPdfPageButton"
 import DeleteAccountButton from "../../components/DeleteAccount"
 import { MergePdfsButton } from "../../components/MergePdfsButton"
+import { DeleteAccountPopUpBox } from "../../components/DeleteAccountPopUpBox"
+import { useShowPopUp } from "../../store/ShowPopUp"
 export default function Dashboard() {
 
     const { user } = useAuth()
+    const { show } = useShowPopUp();
 
     return (
 
@@ -25,6 +28,10 @@ export default function Dashboard() {
             <DeleteAccountButton />
             <ImagesToPdfPageButton />
             <MergePdfsButton />
+
+            {show && (
+                <DeleteAccountPopUpBox />
+            )}
         </div>
 
     )

@@ -1,12 +1,14 @@
-import { useAuth } from "../contexts/authContext";
+import { useShowPopUp } from "../store/ShowPopUp"
 
-export default function DeleteAccountButton() {
+export default function DeleteAccountButton(
 
-    const { deleteAccount } = useAuth();
+) {
+
+    const { setShow } = useShowPopUp();
 
     return (
         <button
-            onClick={deleteAccount}
+            onClick={() => setShow(true)}
             className="border cursor-pointer"
         >
             Delete Account
