@@ -1,6 +1,6 @@
 import { useRef, useState } from "react"
 import { usePDF } from "../../contexts/pdfContext";
-
+import { BackButton } from "../../components/BackButton";
 export default function ImagesToPdfPage() {
     const { isConverting, convertImagesToPdf, convertingError } = usePDF();
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -36,7 +36,8 @@ export default function ImagesToPdfPage() {
 
     return (
         <div>
-            <h1>convert image to pdf</h1>
+            <BackButton />
+            <h1 className="text-2xl font-bold" >Convert Images To PDF</h1>
             <input
                 type="file"
                 ref={fileInputRef}

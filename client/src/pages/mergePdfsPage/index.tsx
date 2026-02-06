@@ -1,6 +1,7 @@
 import {  useRef, useState } from "react"
 import { X } from "lucide-react";
 import { usePDF } from "../../contexts/pdfContext";
+import { BackButton } from "../../components/BackButton";
 export default function MergePdfsPage() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -37,7 +38,8 @@ export default function MergePdfsPage() {
 
     return (
         <div>
-            <h1>Merge PDFs</h1>
+            <BackButton />
+            <h1 className="text-2xl font-bold">Merge Multiple PDFs</h1>
             <input
                 ref={fileInputRef}
                 type="file"
