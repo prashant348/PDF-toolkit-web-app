@@ -1,5 +1,5 @@
 import { downloadBlob } from "../../utils/downloadBlob";
-
+import { type ApiError } from "../../libs/api";
 const FASTAPI_BASE_URL = import.meta.env.VITE_FASTAPI_BASE_URL
 
 export async function imagesToPdf(
@@ -14,7 +14,16 @@ export async function imagesToPdf(
         body: formData
     })
 
-    if (!res.ok) throw new Error("Error converting files to pdf");
+    if (!res.ok) {
+        const data: object | string = await res.json().catch(async () => {
+            const txt = await res.text();
+            return txt;
+        })
+        throw {
+            status: res.status,
+            message: data,
+        } as ApiError;
+    }
     console.log("res from imageToPdf: ", res);
     const blob = await res.blob();
     console.log("blob: ", blob)

@@ -3,14 +3,14 @@ import type { RegisterFormData } from "../../schemas/RegisterSchema"
 import { registerResolver } from "../../schemas/RegisterSchema"
 import { Link } from "react-router-dom"
 import { useAuth } from "../../contexts/authContext"
-export default function RegisterPage() {
 
+export default function RegisterPage() {
   const { register: _register, registrationError, isRegistering } = useAuth();
 
   const {
-    register, // to register input fields
-    handleSubmit, // to handle form submission
-    formState: { errors } // errors and loading state of form
+    register,
+    handleSubmit,
+    formState: { errors }
   } = useForm<RegisterFormData>({
     resolver: registerResolver
   })
@@ -19,76 +19,119 @@ export default function RegisterPage() {
     await _register(data);
   }
 
-  // useEffect(() => {
-  //   if (registrationError) {
-  //     alert(registrationError);
-  //   }
-  // }, [registrationError]);
-
   return (
-    <div>
-      <h1>Register</h1>
-      {/* handleSubmit of useForm hook will automatically run data validation */}
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {/* email field */}
-        <div>
-          <input
-            id="email"
-            type="email"
-            placeholder="Email"
-            {...register("email")} // register email field
-          />
-          {/* if error occurs in email field */}
-          {errors.email && (
-            <p className="text-red-500">{errors.email.message}</p>
-          )}
+    <div className="min-h-screen bg-linear-to-br from-blue-50 to-white flex items-center justify-center px-4 py-8">
+      <div className="w-full max-w-md">
+        {/* Card Container */}
+        <div className="bg-white rounded-2xl shadow-lg p-8 border border-blue-100">
+          
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">Create Account</h1>
+            <p className="text-gray-500 text-sm">Sign up to get started</p>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            
+            {/* Email Field */}
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                Email Address
+              </label>
+              <input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                {...register("email")}
+                className={`w-full px-4 py-3 rounded-lg border ${
+                  errors.email 
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-200' 
+                    : 'border-gray-300 focus:border-blue-500 focus:ring-blue-200'
+                } focus:outline-none focus:ring-2 transition-colors`}
+              />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1.5 ml-1">{errors.email.message}</p>
+              )}
+            </div>
+
+            {/* Password Field */}
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                {...register("password")}
+                className={`w-full px-4 py-3 rounded-lg border ${
+                  errors.password 
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-200' 
+                    : 'border-gray-300 focus:border-blue-500 focus:ring-blue-200'
+                } focus:outline-none focus:ring-2 transition-colors`}
+              />
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-1.5 ml-1">{errors.password.message}</p>
+              )}
+            </div>
+
+            {/* Confirm Password Field */}
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                Confirm Password
+              </label>
+              <input
+                id="confirmPassword"
+                type="password"
+                placeholder="••••••••"
+                {...register("confirmPassword")}
+                className={`w-full px-4 py-3 rounded-lg border ${
+                  errors.confirmPassword 
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-200' 
+                    : 'border-gray-300 focus:border-blue-500 focus:ring-blue-200'
+                } focus:outline-none focus:ring-2 transition-colors`}
+              />
+              {errors.confirmPassword && (
+                <p className="text-red-500 text-xs mt-1.5 ml-1">{errors.confirmPassword.message}</p>
+              )}
+            </div>
+
+            {/* Registration Error */}
+            {registrationError && !isRegistering && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <p className="text-red-600 text-sm text-center">{registrationError}</p>
+              </div>
+            )}
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isRegistering}
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-3 rounded-lg transition-colors duration-200 disabled:cursor-not-allowed"
+            >
+              {isRegistering ? "Creating Account..." : "Create Account"}
+            </button>
+          </form>
+
+          {/* Login Link */}
+          <div className="mt-6 text-center">
+            <p className="text-gray-600 text-sm">
+              Already have an account?{' '}
+              <Link 
+                to="/login" 
+                className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition-colors"
+              >
+                Log In
+              </Link>
+            </p>
+          </div>
         </div>
 
-        {/* password field */}
-        <div>
-          <input
-            id="password"
-            type="password"
-            placeholder="Password"
-            {...register("password")}
-          />
-          {/* if error occurs in password field */}
-          {errors.password && (
-            <p className="text-red-500">{errors.password.message}</p>
-          )}
-        </div>
-
-        {/* confirm password field */}
-        <div>
-          <input
-            id="confirmPassword"
-            type="password"
-            placeholder="Confirm Password"
-            {...register("confirmPassword")}
-          />
-          {/* if error occurs in confirmPassword field */}
-          {errors.confirmPassword && (
-            <p className="text-red-500">{errors.confirmPassword.message}</p>
-          )}
-        </div>
-
-        {registrationError && !isRegistering && (
-          <p className="text-red-500 text-sm">{registrationError}</p>
-        )}
-        
-        <button
-          type="submit"
-          disabled={isRegistering}
-        >
-          {isRegistering ? "Registering..." : "Register"}
-        </button>
-
-      </form>
-      <div>
-        <p>already have an account?</p>
-        <Link to={"/login"} className="text-blue-500 underline">
-          Log In
-        </Link>
+        {/* Footer Text (Optional) */}
+        <p className="text-center text-gray-500 text-xs mt-6">
+          By signing up, you agree to our Terms & Privacy Policy
+        </p>
       </div>
     </div>
   )

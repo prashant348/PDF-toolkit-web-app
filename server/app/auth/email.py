@@ -45,7 +45,7 @@ async def send_email_verification_link(
     """
 
     message = MessageSchema(
-        subject="FastAPI Mail Module",
+        subject="PDF Toolkit Email Verification",
         recipients=[data.email],
         body=html,
         subtype=MessageType.html

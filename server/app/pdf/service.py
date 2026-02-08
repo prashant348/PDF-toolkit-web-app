@@ -30,7 +30,7 @@ class PDFService:
             if file.content_type not in ALLOWED_TYPES:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Only PNG and JPEG images are allowed"
+                    detail="Only JPG, PNG and JPEG images are allowed"
                 )
             
             # read file bytes 

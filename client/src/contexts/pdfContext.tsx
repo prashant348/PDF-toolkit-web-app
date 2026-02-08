@@ -33,7 +33,12 @@ export function PDFProvider({children}: PDFProviderProps) {
             await imagesToPdf(files);
         } catch (err: any) { 
             console.log("err: ", err)
-            setConvertingError(err.message.message);
+            setConvertingError(() => {
+                if (typeof err.message === "object") {
+                    return err.message.message;
+                }
+                return err.message;
+            });
         } finally {
             setIsConverting(false);
         }
@@ -48,7 +53,12 @@ export function PDFProvider({children}: PDFProviderProps) {
             await mergePdfs(files);
         } catch (err: any) {
             console.log("err: ", err);
-            setMergingError(err.message.message);
+            setMergingError(() => {
+                if (typeof err.message === "object") {
+                    return err.message.message;
+                }
+                return err.message;
+            });
         } finally {
             setIsMerging(false);
         }
