@@ -10,7 +10,7 @@ import VerifyEmailPage from "./pages/VerifyEmailPage";
 import ConfirmEmailPage from "./pages/ConfirmEmailPage";
 import UnverifiedUserRoute from "./components/UnverifiedUserRoute";
 import MergePdfsPage from "./pages/mergePdfsPage";
-
+import SplitPdfPage from "./pages/SplitPdfPage";
 function App() {
 
   return (
@@ -57,7 +57,13 @@ function App() {
             <ProtectedRoute>
               <MergePdfsPage />
             </ProtectedRoute>
-          } 
+          }
+          />
+          <Route path="/dashboard/pdf/split-pdf" element={
+            <ProtectedRoute>
+              <SplitPdfPage />
+            </ProtectedRoute>
+          }
           />
         </Routes>
       </Router>

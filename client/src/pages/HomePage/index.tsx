@@ -49,8 +49,8 @@ export default function HomePage() {
           {!user && (
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <RegisterButton />
-              <a 
-                href="#features" 
+              <a
+                href="#features"
                 className="px-6 py-3 text-blue-600 hover:text-blue-700 font-medium transition-colors"
               >
                 Learn More →
@@ -91,6 +91,19 @@ export default function HomePage() {
           <div className="bg-white rounded-2xl p-6 sm:p-8 border border-blue-100 shadow-sm hover:shadow-md transition-shadow">
             <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
               <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">Split PDF</h3>
+            <p className="text-gray-600 text-sm">
+              Split a PDF file into multiple PDF files with ease.
+            </p>
+          </div>
+
+          {/* feature 4 */}
+          <div className="bg-white col-2 rounded-2xl p-6 sm:p-8 border border-blue-100 shadow-sm hover:shadow-md transition-shadow">
+            <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
+              <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
@@ -99,6 +112,7 @@ export default function HomePage() {
               Your files are processed securely. We respect your privacy and data.
             </p>
           </div>
+
         </div>
 
         {/* How It Works Section */}
@@ -114,7 +128,7 @@ export default function HomePage() {
               </div>
               <h4 className="text-xl font-semibold text-gray-800 mb-2">Upload Files</h4>
               <p className="text-gray-600 text-sm">
-                Select the files you want to convert or merge
+                Select the files you want to convert or merge or split
               </p>
             </div>
 
@@ -136,7 +150,7 @@ export default function HomePage() {
               </div>
               <h4 className="text-xl font-semibold text-gray-800 mb-2">Download</h4>
               <p className="text-gray-600 text-sm">
-                Get your converted or merged PDF instantly
+                Get your converted or merged or splitted PDF instantly
               </p>
             </div>
           </div>

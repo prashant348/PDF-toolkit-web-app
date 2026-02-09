@@ -5,7 +5,7 @@ import DeleteAccountButton from "../../components/ui/DeleteAccount"
 import { MergePdfsButton } from "../../components/ui/MergePdfsButton"
 import { DeleteAccountPopUpBox } from "../../components/ui/DeleteAccountPopUpBox"
 import { useShowPopUp } from "../../store/ShowPopUp"
-
+import { SplitPdfButton } from "../../components/ui/SplitPdfButton"
 export default function Dashboard() {
     const { user } = useAuth()
     const { show } = useShowPopUp();
@@ -54,6 +54,7 @@ export default function Dashboard() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <ImagesToPdfPageButton />
                         <MergePdfsButton />
+                        <SplitPdfButton />
                     </div>
                 </div>
 

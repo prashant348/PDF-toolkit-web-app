@@ -5,7 +5,7 @@ from fastapi.responses import StreamingResponse
 from typing import List
 from PIL import Image
 from pypdf import PdfWriter, PdfReader
-import io
+import io, zipfile
 
 ALLOWED_TYPES = [
     "image/jpeg",
@@ -101,3 +101,63 @@ class PDFService:
             },
             content=output_buffer
         )
+
+    async def split_pdf(
+            self, 
+            file: UploadFile,
+            ranges: str
+    ):
+        if file.content_type != "application/pdf":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Only PDF files are allowed"
+            )
+        
+        pdf_bytes = await file.read()
+        reader = PdfReader(BytesIO(pdf_bytes))
+        total_pages = len(reader.pages)
+
+        zip_buffer = io.BytesIO()
+
+        with zipfile.ZipFile(zip_buffer, "w") as zipf:
+            parts = ranges.split(",")
+
+            for idx, part in enumerate(parts):
+                writer = PdfWriter()
+
+                if "-" in part:
+                    start, end = map(int, part.split("-"))
+                else: 
+                    start = end = int(part)
+
+                if start < 1 or end > total_pages or start > end:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="Invalid page range"
+                    )
+                
+                for page_num in range(start - 1, end):
+                    writer.add_page(reader.pages[page_num])
+
+                pdf_buffer = io.BytesIO()
+                writer.write(pdf_buffer)
+                pdf_buffer.seek(0)
+
+                zipf.writestr(
+                    f"part_{idx + 1}.pdf", 
+                    pdf_buffer.read()
+                )
+
+        zip_buffer.seek(0)
+
+        return StreamingResponse(
+            status_code=200,
+            media_type="application/zip",
+            headers={
+                "Content-Disposition": f"attachment; filename={file.filename}.zip"
+            },
+            content=zip_buffer
+        )
+
+
+            

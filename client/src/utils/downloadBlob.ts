@@ -9,7 +9,8 @@ export function downloadBlob(
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${filename}.pdf`;
+    const ext = blob.type === "application/zip"? "zip": "pdf";
+    a.download = `${filename}.${ext}`;
     a.click();
     window.URL.revokeObjectURL(url);
 }

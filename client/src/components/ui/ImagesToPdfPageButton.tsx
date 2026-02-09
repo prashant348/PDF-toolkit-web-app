@@ -13,7 +13,7 @@ export default function ImagesToPdfPageButton() {
                 </div>
                 <div>
                     <h3 className="font-semibold text-gray-800 mb-1">Images to PDF</h3>
-                    <p className="text-sm text-gray-600">Convert images to PDF documents</p>
+                    <p className="text-sm text-gray-600">Convert multiple images to a single PDF</p>
                 </div>
             </div>
         </Link>
