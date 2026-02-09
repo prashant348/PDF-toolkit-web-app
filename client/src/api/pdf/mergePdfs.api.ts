@@ -28,5 +28,5 @@ export async function mergePdfs(
     console.log("res from imageToPdf: ", res);
     const blob = await res.blob();
     console.log("blob: ", blob)
-    downloadBlob(blob, "mergedPdfs");
+    downloadBlob(blob);
 }
