@@ -44,3 +44,6 @@ def generate_email_verification_token(email: str) -> str:
 
 def verify_email_verification_token(token: str):
     return jwt.decode(token, JWT_SECRET, algorithms=ALGORITHMS[0])
+
+def generate_csrf_token() -> str:
+    return secrets.token_hex(64)

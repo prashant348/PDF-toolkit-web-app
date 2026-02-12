@@ -2,7 +2,8 @@ from auth.repository import AuthRepository
 from auth.utils import validate_password, generate_access_token, verify_access_token
 from fastapi import Request, HTTPException, status
 from jose import JWTError
-
+from fastapi import Depends
+from core.session import get_db
 
 # repo = AuthRepository(db=Depends(get_db))
 
@@ -60,6 +61,23 @@ def get_current_user(repo: AuthRepository, request: Request):
     
     return user
 
+def csrf_dependency(req: Request):
 
+    csrf_token_from_cookie = req.cookies.get("csrf_token")
+    csrf_token_from_header = req.headers.get("x-csrf-token")
 
+    if not csrf_token_from_cookie or not csrf_token_from_header:
+        print("no csrf token from header")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="CSRF token missing"
+        )
 
+    if csrf_token_from_cookie != csrf_token_from_header:
+        print("csrf token mismatch")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="CSRF token mismatch"
+        )
+    
+    return csrf_token_from_cookie

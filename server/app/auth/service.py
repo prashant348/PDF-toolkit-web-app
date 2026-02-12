@@ -3,7 +3,7 @@ from auth.utils import hash_password, normalized_email, generate_access_token
 from auth.dependencies import authenticate_user
 from fastapi.responses import JSONResponse
 from datetime import datetime, timedelta, timezone
-from auth.utils import generate_refresh_token, generate_email_verification_token, verify_email_verification_token
+from auth.utils import generate_refresh_token, generate_email_verification_token, verify_email_verification_token, generate_csrf_token
 from fastapi import Request, HTTPException, status, BackgroundTasks
 from auth.schemas import EmailSchema, UserPublic
 from auth.email import send_email_verification_link
@@ -11,6 +11,7 @@ from core.redis import redis_client as rc
 import os
 
 REFRESH_TOKEN_EXPIRE_DAYS = 7
+CSRF_TOKEN_EXPIRE_DAYS = 7
 # BASE_URL = os.getenv("FASTAPI_BASE_URL") 
 CLIENT_BASE_URL = os.getenv("REACT_BASE_URL")
 
@@ -69,8 +70,9 @@ class AuthService:
                 detail="Invalid credentials"
             ) 
             
-        # if user is authenticated then create refresh token
+        # if user is authenticated then create refresh token and csrf token
         refresh_token = generate_refresh_token()
+        csrf_token = generate_csrf_token()
         # get user id
         user = self.repo.get_user_by_email(email)
         
@@ -107,6 +109,15 @@ class AuthService:
         )
 
         response.set_cookie(
+            key="csrf_token",
+            value=csrf_token,
+            max_age=CSRF_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
+            httponly=False,
+            samesite="lax",
+            secure=False # for local dev only
+        )
+
+        response.set_cookie(
             key="refresh_token",
             value=refresh_token,
             max_age= REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60, # 7 days
@@ -114,6 +125,7 @@ class AuthService:
             samesite="lax",
             secure=False # for local dev only
         )
+
 
         # now return the response object
         return response
