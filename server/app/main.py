@@ -12,10 +12,7 @@ load_dotenv()
 
 app = FastAPI()
 port = int(os.getenv("FASTAPI_PORT"))
-origins = [
-    "http://localhost:5173", # frontend server url
-    "http://127.0.0.1:5173"
-]
+origins = ["*"]
 app.add_middleware(
     CORSMiddleware,             # cors middleware
     allow_origins=origins,       # List of allowed origins
