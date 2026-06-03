@@ -12,9 +12,10 @@ load_dotenv()
 
 app = FastAPI()
 port = int(os.getenv("FASTAPI_PORT"))
+client_url = os.getenv("CLIENT_BASE_URL")
 app.add_middleware(
     CORSMiddleware,             # cors middleware
-    allow_origins=["http://localhost:5173"],       # List of allowed origins
+    allow_origins=[client_url],       # List of allowed origins
     allow_credentials=True,     # Allow cookies/auth headers
     allow_methods=["*"],         # Allow all HTTP methods (GET, POST, etc.)
     allow_headers=["*"],         # Allow all headers
