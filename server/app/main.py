@@ -7,10 +7,13 @@ from auth.router import router as auth_router
 from pdf.router import router as pdf_router
 import uvicorn
 import os
+from core.database import engine, Base
 
 load_dotenv()
 
 app = FastAPI()
+Base.metadata.create_all(bind=engine)
+
 port = int(os.getenv("FASTAPI_PORT"))
 client_url = os.getenv("CLIENT_BASE_URL")
 app.add_middleware(
