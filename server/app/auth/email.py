@@ -23,8 +23,8 @@ conf = ConnectionConfig(
     MAIL_FROM=str(NameEmail(MAIL_FROM_NAME, MAIL_FROM_EMAIL)),
     MAIL_PORT=int(MAIL_PORT),
     MAIL_SERVER=MAIL_SERVER, 
-    MAIL_STARTTLS=False,
-    MAIL_SSL_TLS=True,
+    MAIL_STARTTLS=True,
+    MAIL_SSL_TLS=False,
     USE_CREDENTIALS=True,
     VALIDATE_CERTS=True 
 )  
