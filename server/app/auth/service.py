@@ -13,7 +13,7 @@ import os
 REFRESH_TOKEN_EXPIRE_DAYS = 7
 CSRF_TOKEN_EXPIRE_DAYS = 7
 # BASE_URL = os.getenv("FASTAPI_BASE_URL") 
-CLIENT_BASE_URL = os.getenv("REACT_BASE_URL")
+CLIENT_BASE_URL = os.getenv("CLIENT_BASE_URL")
 
 class AuthService:
     def __init__(self, repo: AuthRepository) -> None:

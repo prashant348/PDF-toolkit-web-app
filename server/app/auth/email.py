@@ -1,62 +1,41 @@
 from auth.schemas import EmailSchema
-from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType, NameEmail
 from dotenv import load_dotenv
 import os
+import httpx
 
 load_dotenv()
 
-MAIL_USERNAME=os.getenv("MAIL_USERNAME")
-MAIL_PASSWORD=os.getenv("MAIL_PASSWORD")
-MAIL_FROM_EMAIL=os.getenv("MAIL_FROM_EMAIL")
-MAIL_FROM_NAME=os.getenv("MAIL_FROM_NAME")
-MAIL_PORT=os.getenv("MAIL_PORT")
-MAIL_SERVER=os.getenv("MAIL_SERVER")
-
-# Validate config early and set sensible defaults
-if not MAIL_SERVER or not MAIL_FROM_EMAIL or not MAIL_USERNAME or not MAIL_PASSWORD:
-    raise RuntimeError("Missing mail configuration: set MAIL_SERVER, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD, MAIL_FROM_EMAIL in .env")
+RESEND_API_KEY = os.getenv("RESEND_API_KEY")
 
 
-conf = ConnectionConfig( 
-    MAIL_USERNAME=MAIL_USERNAME,
-    MAIL_PASSWORD=MAIL_PASSWORD,
-    MAIL_FROM=str(NameEmail(MAIL_FROM_NAME, MAIL_FROM_EMAIL)),
-    MAIL_PORT=int(MAIL_PORT),
-    MAIL_SERVER=MAIL_SERVER, 
-    MAIL_STARTTLS=True,
-    MAIL_SSL_TLS=False,
-    USE_CREDENTIALS=True,
-    VALIDATE_CERTS=True 
-)  
+# Validate config early
+if not RESEND_API_KEY:
+    raise RuntimeError("Missing mail configuration: set RESEND_API_KEY in .env")
 
-
-async def send_email_verification_link(
-        data: EmailSchema, 
-        token: str, 
-        base_url: str
-    ):
-    
-    # verification_url = f"{base_url}/auth/verify-email?token={token}"
-    client_side_verification_url=f"{base_url}/confirm-email?token={token}"
-
+async def send_email_verification_link(data: EmailSchema, token: str, base_url: str):
+    client_side_verification_url = f"{base_url}/confirm-email?token={token}"
     html = f"""
     <p>Click to verify your email</p>
     <a href="{client_side_verification_url}">Verify Email</a>
     """
-
-    message = MessageSchema(
-        subject="PDF Toolkit Email Verification",
-        recipients=[data.email],
-        body=html,
-        subtype=MessageType.html
-    )
-
-    fm = FastMail(conf)
-
-    await fm.send_message(message)
-
-    return {
-        "success": True,
-        "message": "Email sent successfully"
-    }
     
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            url="https://api.resend.com/emails",  # Sahi endpoint URL
+            headers={
+                "Authorization": f"Bearer {RESEND_API_KEY}",
+                "Content-Type": "application/json"
+            },
+            json={
+                # Naye account ke liye 'onboarding@resend.dev' use karna zaroori hai
+                "from": "PDF Toolkit <onboarding@resend.dev>",
+                "to": [data.email],
+                "subject": "PDF Toolkit Email Verification",
+                "html": html,
+            }
+        )
+        
+    if response.status_code == 200:
+        return {"success": True, "message": "Email sent successfully"}
+    else:
+        return {"success": False, "message": f"Failed: {response.text}"}
