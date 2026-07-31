@@ -187,3 +187,10 @@ Docs about SQLAlchemy patterns are in docs/SQLAlchemy.md.
 - See server/SQLAlchemy for setting up SQLAlchemy ORM with PostgreSQL & FastAPI.
 - See server/ for authentication patterns (server/app/auth) and PDF logic (server/app/pdf).
 - Redis integration exists under server/app/core/redis.py for background task coordination.
+
+---
+
+## License
+
+This project is proprietary. All rights reserved. See [LICENSE.md](LICENSE.md) for details.  
+Viewing the repository does not grant permission to copy, modify, distribute, or claim the project as your own.
