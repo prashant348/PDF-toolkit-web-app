@@ -14,6 +14,9 @@ REFRESH_TOKEN_EXPIRE_DAYS = 7
 CSRF_TOKEN_EXPIRE_DAYS = 7
 # BASE_URL = os.getenv("FASTAPI_BASE_URL") 
 CLIENT_BASE_URL = os.getenv("CLIENT_BASE_URL")
+ENV = os.getenv("ENV")
+IS_LOCAL = True if ENV == "developement" else False
+if IS_LOCAL: print("IS_LOCAL: ", IS_LOCAL)
 
 class AuthService:
     def __init__(self, repo: AuthRepository) -> None:
@@ -105,7 +108,7 @@ class AuthService:
             max_age= 30 * 60, # 30 mins
             httponly=True,
             samesite="lax",
-            secure=False # for local dev only
+            secure=not IS_LOCAL # false for local dev only
         )
 
         response.set_cookie(
@@ -114,7 +117,7 @@ class AuthService:
             max_age=CSRF_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
             httponly=False,
             samesite="lax",
-            secure=False # for local dev only
+            secure=not IS_LOCAL # false for local dev only
         )
 
         response.set_cookie(
@@ -123,7 +126,7 @@ class AuthService:
             max_age= REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60, # 7 days
             httponly=True,
             samesite="lax",
-            secure=False # for local dev only
+            secure=not IS_LOCAL # false for local dev only
         )
 
 
