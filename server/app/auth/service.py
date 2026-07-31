@@ -17,6 +17,7 @@ CLIENT_BASE_URL = os.getenv("CLIENT_BASE_URL")
 ENV = os.getenv("ENV")
 IS_LOCAL = True if ENV == "developement" else False
 if IS_LOCAL: print("IS_LOCAL: ", IS_LOCAL)
+samesite_policy = "lax" if IS_LOCAL else "none"
 
 class AuthService:
     def __init__(self, repo: AuthRepository) -> None:
@@ -107,8 +108,8 @@ class AuthService:
             value=access_token,
             max_age= 30 * 60, # 30 mins
             httponly=True,
-            samesite="lax",
-            secure=not IS_LOCAL # false for local dev only
+            samesite=samesite_policy,   # Local par 'lax', Render par 'none'
+            secure=not IS_LOCAL         # Local par False, Render par True 
         )
 
         response.set_cookie(
@@ -116,8 +117,8 @@ class AuthService:
             value=csrf_token,
             max_age=CSRF_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
             httponly=False,
-            samesite="lax",
-            secure=not IS_LOCAL # false for local dev only
+            samesite=samesite_policy,  # Local par 'lax', Render par 'none'
+            secure=not IS_LOCAL        # Local par False, Render par True
         )
 
         response.set_cookie(
@@ -125,8 +126,8 @@ class AuthService:
             value=refresh_token,
             max_age= REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60, # 7 days
             httponly=True,
-            samesite="lax",
-            secure=not IS_LOCAL # false for local dev only
+            samesite=samesite_policy,  # Local par 'lax', Render par 'none'
+            secure=not IS_LOCAL        # Local par False, Render par True
         )
 
 
