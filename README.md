@@ -5,7 +5,7 @@ A full‑stack PDF toolkit web application for common PDF operations (merge, spl
 ## Key features
 - Merge multiple PDFs into one
 - Split PDF into pages or ranges
-- Convert images → PDF and PDF → images
+- Convert images → PDF
 - Instantly download processed files
 - User authentication, session handling, and background processing hooks
 - Database-backed metadata storage (Postgres + SQLAlchemy)
